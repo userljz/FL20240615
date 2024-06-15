@@ -35,15 +35,6 @@ def train_fl(cfg):
         
         if round_i == 1:
             param = get_parameters(CustomCLIP(cfg))
-        else:
-            # ===== Aggregation =====
-            param = server.server_conduct(results)
-            
-            # ===== Test Global =====
-            client_agg = client_fn(cfg, param)
-            datamodule = DataModule(cfg, client_idx=1)
-            trainer = hydra.utils.instantiate(cfg.trainer)
-            trainer.test(client_agg, datamodule=datamodule)
             
         client_list_use = select_round_clients(cfg.fl.client_num, cfg.fl.select_client_num)
         print("----------")
@@ -64,5 +55,14 @@ def train_fl(cfg):
             fit_res = FitRes(_param, num_samples)
             results.append(fit_res)
             print(f"===== Round-{round_i}|Client-{client_idx} End =====")
+        
+        # ===== Aggregation =====
+        param = server.server_conduct(results)
+        
+        # ===== Test Global =====
+        client_agg = client_fn(cfg, param)
+        datamodule = DataModule(cfg, client_idx=1)
+        trainer = hydra.utils.instantiate(cfg.trainer)
+        trainer.test(client_agg, datamodule=datamodule)
  
     return

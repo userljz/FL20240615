@@ -9,7 +9,7 @@ import numpy as np
 
 def set_parameters(net, parameters):
     params_dict = zip(net.state_dict().keys(), parameters)
-    state_dict = OrderedDict({k: torch.Tensor(v) for k, v in params_dict})
+    state_dict = OrderedDict({k: torch.tensor(v) for k, v in params_dict})
     net.load_state_dict(state_dict, strict=True)
     return net
 
@@ -63,3 +63,4 @@ dtype_mapping = {
     "torch.float16": torch.float16,
     "torch.float64": torch.float64,
 }
+ 
