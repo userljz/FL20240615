@@ -7,3 +7,6 @@ omegaconf
 hydra-core
 tqdm
 matplotlib
+
+ftfy
+regex
