@@ -17,6 +17,7 @@ class Client(pl.LightningModule):
         self.model = custom_clip
         
         self.val_acc_batch = []
+        self.test_acc_batch = []
         
     def on_train_start(self):
         self.model = set_parameters(self.model, self.param)
@@ -51,6 +52,24 @@ class Client(pl.LightningModule):
         self.log("train_loss", loss)
         
         return loss
+    
+    def test_step(self, batch, batch_idx):
+        x, y = batch
+        model_ret = self.model(x, y)
+        logits = model_ret["logits"]
+        loss = model_ret["loss"]
+        
+        preds = torch.argmax(logits, dim=1)
+        acc = (preds == y).float().mean()
+        self.test_acc_batch.append(acc)
+        
+        self.log('test_acc_batch', acc, prog_bar=True)
+        return {'test_loss': loss, 'test_acc': acc}
+    
+    def on_test_epoch_end(self):
+        avg_test_acc = torch.stack(self.test_acc_batch).mean()
+        print(f"----- test_acc_epoch: {avg_test_acc} -----")
+        self.log('test_acc_epoch', avg_test_acc, prog_bar=True, logger=True)
     
     def validation_step(self, batch, batch_idx):
         x, y = batch
