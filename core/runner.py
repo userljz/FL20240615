@@ -35,6 +35,9 @@ def train_fl(cfg):
         
         if round_i == 1:
             param = get_parameters(CustomCLIP(cfg))
+            num_sanity_val_steps = 2
+        else:
+            num_sanity_val_steps = 0
             
         client_list_use = select_round_clients(cfg.fl.client_num, cfg.fl.select_client_num)
         print("----------")
@@ -46,7 +49,7 @@ def train_fl(cfg):
             print(f"===== Round-{round_i}|Client-{client_idx} Start =====")
             datamodule = DataModule(cfg, client_idx)
             client = client_fn(cfg, param)
-            trainer = hydra.utils.instantiate(cfg.trainer)
+            trainer = hydra.utils.instantiate(cfg.trainer, num_sanity_val_steps=num_sanity_val_steps)
             trainer.fit(client, datamodule=datamodule)
             
             _param = get_parameters(client)
