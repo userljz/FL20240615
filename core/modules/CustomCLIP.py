@@ -3,16 +3,18 @@ import torch.nn as nn
 from clip import clip
 from core.modules.losses import contrastive_loss
 from core.modules.PromptLearner import PromptLearner
+from core.utils import dtype_mapping
 
 
 class TextEncoder(nn.Module):
-    def __init__(self, clip_model):
+    def __init__(self, cfg, clip_model):
         super().__init__()
+        self.dtype = dtype_mapping[cfg.dtype]
+        clip_model = clip_model.to(self.dtype)
         self.transformer = clip_model.transformer
         self.positional_embedding = clip_model.positional_embedding
         self.ln_final = clip_model.ln_final
         self.text_projection = clip_model.text_projection
-        self.dtype = clip_model.dtype
 
     def forward(self, prompts, tokenized_prompts):
         x = prompts + self.positional_embedding.type(self.dtype)
@@ -72,14 +74,16 @@ class ClipModel_from_generated(nn.Module):
 class CustomCLIP(nn.Module):
     def __init__(self, cfg):
         super().__init__()
+        self.dtype = dtype_mapping[cfg.dtype]
         origin_clip, _ = clip.load(cfg.clip.backbone, device=cfg.device.cuda)
+        origin_clip = origin_clip.to(self.dtype)
         classnames = cfg.dataset.classnames
         
         self.image_encoder = ClipModel_from_generated(cfg)
-        self.text_encoder = TextEncoder(origin_clip)
+        self.text_encoder = TextEncoder(cfg, origin_clip)
         self.prompt_learner = PromptLearner(cfg, classnames, origin_clip, self.text_encoder)
         self.logit_scale = origin_clip.logit_scale
-        self.dtype = origin_clip.dtype
+        
         self.cfg = cfg
         self.loss = contrastive_loss
 
@@ -110,7 +114,6 @@ class CustomCLIP(nn.Module):
         return ret_dict["loss"]
 
     def forward(self, image, label=None):
-        print(f"===== In CustomCLIP forward =====")
         tokenized_prompts = self.prompt_learner.tokenized_prompts
 
         image_features = self.image_encoder(image.type(self.dtype))
@@ -124,14 +127,10 @@ class CustomCLIP(nn.Module):
             text_features = text_features + w
         text_features = text_features / text_features.norm(dim=-1, keepdim=True)
         
-        print(f"{label = }")
         ret_dict = self.loss(image_features, text_features, label, t=self.logit_scale)
         loss, logits = ret_dict["loss"], ret_dict["logits"]
 
         if self.cfg.clip.text_to_text_enable:
-            print(f"{loss = }")
-            print(f"{self.cfg.clip.text_to_text_weight = }")
-            print(f"{self.forward_text_to_text() = }")
             loss = loss + float(self.cfg.clip.text_to_text_weight) * self.forward_text_to_text()
 
         return {"loss": loss, "logits": logits}

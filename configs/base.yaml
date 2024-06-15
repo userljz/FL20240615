@@ -6,19 +6,19 @@ defaults:
 device:
   cuda_visible_devices:  "0,1,2,3"
   id: 0
-  cuda: cpu  # cpu  cuda:${device.id}
+  cuda: cuda:${device.id}  # cpu  cuda:${device.id}
   float32_matmul_precision: medium
 
 trainer:
   _target_:  pytorch_lightning.Trainer
   _convert_: all
-  max_epochs: 200
+  max_epochs: 20
   log_every_n_steps: 1
   check_val_every_n_epoch: 2
-#  devices:
-#    - ${device.id}
-  devices: 1
-  accelerator: 'cpu'  # 'gpu' 'cpu'
+  devices:
+    - ${device.id}
+  # devices: 1
+  accelerator: 'gpu'  # 'gpu' 'cpu'
 
   enable_model_summary: false
 
@@ -40,7 +40,7 @@ logger:
 fl:
   client_num: 20
   select_client_num: 15
-  round: 100
+  round: 400
   dirichlet_alpha: 0.1
 
 mode: train
@@ -58,3 +58,5 @@ clip:
 
   text_to_text_enable: True
   text_to_text_weight: 1
+
+dtype: torch.float32

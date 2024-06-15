@@ -43,7 +43,6 @@ class Client(pl.LightningModule):
         return optimizer
     
     def training_step(self, batch, batch_idx):
-        print(f"===== In Client's training_step =====")
         image, label = batch
         image, label = image.to(self.device), label.to(self.device)
         
@@ -54,7 +53,6 @@ class Client(pl.LightningModule):
         return loss
     
     def validation_step(self, batch, batch_idx):
-        print(f"===== In Client's validation_step =====")
         x, y = batch
         model_ret = self.model(x, y)
         logits = model_ret["logits"]
@@ -70,7 +68,7 @@ class Client(pl.LightningModule):
     def on_validation_epoch_end(self):
         # outputs 是一个由 validation_step 返回的字典组成的列表
         avg_val_acc = torch.stack(self.val_acc_batch).mean()
-        
+        print(f"----- val_acc_epoch: {avg_val_acc} -----")
         # Log average accuracy for the entire validation epoch
         self.log('val_acc_epoch', avg_val_acc, prog_bar=True, logger=True)
     

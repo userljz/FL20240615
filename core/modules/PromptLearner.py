@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 from clip import clip
 from clip.simple_tokenizer import SimpleTokenizer as _Tokenizer
+from core.utils import dtype_mapping
 
 _tokenizer = _Tokenizer()
 
@@ -11,7 +12,8 @@ class PromptLearner(nn.Module):
         super().__init__()
         n_cls = len(classnames)
         ctx_init = cfg.clip.ctx_init
-        dtype = clip_model.dtype
+        dtype = dtype_mapping[cfg.dtype]
+        clip_model = clip_model.to(dtype)
         ctx_dim = clip_model.ln_final.weight.shape[0]
         self.ctx_dim = ctx_dim
         self.cfg = cfg
@@ -19,9 +21,9 @@ class PromptLearner(nn.Module):
         
         ctx_init = ctx_init.replace("_", " ")
         n_ctx = len(ctx_init.split(" "))
-        prompt = clip.tokenize(ctx_init)
+        prompt = clip.tokenize(ctx_init).to(self.device)
         with torch.no_grad():
-            embedding = clip_model.token_embedding(prompt).type(dtype)  # [batch_size, (1+ n_ctx + *), ctx_dim]
+            embedding = clip_model.token_embedding(prompt).to(self.device).type(dtype)  # [batch_size, (1+ n_ctx + *), ctx_dim]
         ctx_vectors = embedding[0, 1: 1 + n_ctx, :]
         prompt_prefix = ctx_init
         
@@ -34,7 +36,7 @@ class PromptLearner(nn.Module):
         name_lens = [len(_tokenizer.encode(name)) for name in classnames]
         prompts = [prompt_prefix + " " + name + "." for name in classnames]
         
-        tokenized_prompts = torch.cat([clip.tokenize(p) for p in prompts])  # (n_cls, n_tkn)
+        tokenized_prompts = torch.cat([clip.tokenize(p) for p in prompts]).to(self.device)  # (n_cls, n_tkn)
         with torch.no_grad():
             embedding = clip_model.token_embedding(tokenized_prompts).type(dtype)
         
@@ -66,7 +68,7 @@ class PromptLearner(nn.Module):
         all_class_text_features = []
         for c_init in template_prompts:
             prompts = [c_init.format(name) for name in all_classnames]
-            tokenized_prompts_all_c = torch.cat([clip.tokenize(p) for p in prompts])  # (n_cls, n_tkn)
+            tokenized_prompts_all_c = torch.cat([clip.tokenize(p) for p in prompts]).to(self.device)  # (n_cls, n_tkn)
             text_encoder_model.to(self.device)
             with torch.no_grad():
                 embedding_all_cls = clip_model.token_embedding(tokenized_prompts_all_c).to(self.device).type(dtype)
@@ -76,7 +78,7 @@ class PromptLearner(nn.Module):
             self.register_buffer("class_text_features", torch.stack(all_class_text_features, dim=0))
         
         prompts = [prompt_prefix + " " + name + "." for name in all_classnames]
-        tokenized_prompts_all_c_ = torch.cat([clip.tokenize(p) for p in prompts])  # (n_cls, n_tkn)
+        tokenized_prompts_all_c_ = torch.cat([clip.tokenize(p) for p in prompts]).to(self.device)  # (n_cls, n_tkn)
         with torch.no_grad():
             embedding = clip_model.token_embedding(tokenized_prompts_all_c_).type(dtype)
         
