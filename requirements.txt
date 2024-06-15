@@ -1,0 +1,9 @@
+addict
+torch -f https://download.pytorch.org/whl/cu118
+torchvision -f https://download.pytorch.org/whl/cu118
+lightning
+wandb
+omegaconf
+hydra-core
+tqdm
+matplotlib

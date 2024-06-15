@@ -1,0 +1,60 @@
+defaults:
+  - dataset: cifar100
+  - system: lasp
+  - _self_
+
+device:
+  cuda_visible_devices:  "0,1,2,3"
+  id: 0
+  cuda: cpu  # cpu  cuda:${device.id}
+  float32_matmul_precision: medium
+
+trainer:
+  _target_:  pytorch_lightning.Trainer
+  _convert_: all
+  max_epochs: 200
+  log_every_n_steps: 1
+  check_val_every_n_epoch: 2
+#  devices:
+#    - ${device.id}
+  devices: 1
+  accelerator: 'cpu'  # 'gpu' 'cpu'
+
+  enable_model_summary: false
+
+optimizer:
+  _target_: torch.optim.AdamW
+  lr: 1e-3
+  weight_decay: 2e-6
+
+# ===========================
+process_title: train768x512MLP
+# ===========================
+
+logger:
+  _target_:  lightning.pytorch.loggers.WandbLogger
+  name: ${process_title}
+  project: '20240528'
+
+
+fl:
+  client_num: 20
+  select_client_num: 15
+  round: 100
+  dirichlet_alpha: 0.1
+
+mode: train
+seed: 42
+
+output_dir: output/cifar100
+
+clip:
+  backbone: ViT-B/32
+  mlp_hiddenlayer_num: 2048
+  ctx_init: "a photo of a"
+
+  text_correction: True
+  templete_prompts: ["a photo of a"]
+
+  text_to_text_enable: True
+  text_to_text_weight: 1
