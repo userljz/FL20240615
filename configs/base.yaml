@@ -29,13 +29,13 @@ optimizer:
   weight_decay: 2e-6
 
 # ===========================
-process_title: train768x512MLP
+process_title: TestLogger1
 # ===========================
 
 logger:
   _target_:  lightning.pytorch.loggers.WandbLogger
   name: ${process_title}
-  project: '20240528'
+  project: '20240616'
 
 
 fl:
@@ -47,7 +47,7 @@ fl:
 mode: train
 seed: 42
 
-output_dir: output/cifar100
+output_dir: outputs
 
 clip:
   backbone: ViT-B/32

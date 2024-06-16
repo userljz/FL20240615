@@ -20,7 +20,7 @@ class Client(pl.LightningModule):
         self.val_acc_batch = []
         self.test_acc_batch = []
         
-        self.mylogger = get_logger(cfg.output_dir + cfg.logger.project + cfg.logger.name)
+        self.mylogger = get_logger(f"{cfg.output_dir}/{cfg.logger.project}_{cfg.logger.name}.log")
         
     def on_train_start(self):
         self.model = set_parameters(self.model, self.param)
