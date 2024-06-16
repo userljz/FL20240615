@@ -8,6 +8,8 @@ from core.modules import CustomCLIP, contrastive_loss
 from core.utils import set_parameters, get_parameters
 from core.logger_utils import get_logger
 
+import wandb
+
 
 class Client(pl.LightningModule):
     def __init__(self, cfg, custom_clip, param, running_args):
@@ -69,6 +71,8 @@ class Client(pl.LightningModule):
         # outputs 是一个由 validation_step 返回的字典组成的列表
         avg_train_loss = torch.stack(self.train_loss_list).mean()
         self.mylogger.info(f"Round[{self.round_idx}]-Client[{self.client_idx}] - Epoch[{self.current_epoch}/{self.trainer.max_epochs}] train_loss: {avg_train_loss}")
+        if self.cfg.logger.wandb_enable:
+            wandb.log({f"Client{self.client_idx}|Train_loss:": avg_train_loss})
         return
     
     def on_test_epoch_start(self):

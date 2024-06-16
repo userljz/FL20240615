@@ -3,6 +3,7 @@ import os
 
 logger = None
 
+
 def get_logger(log_file_name, log_level=logging.DEBUG):
     global logger
 

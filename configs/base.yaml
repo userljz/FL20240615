@@ -36,6 +36,7 @@ logger:
   _target_:  lightning.pytorch.loggers.WandbLogger
   name: ${process_title}
   project: '20240616'
+  wandb_enable: True
 
 
 fl:
