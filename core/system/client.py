@@ -10,7 +10,7 @@ from core.logger_utils import get_logger
 
 
 class Client(pl.LightningModule):
-    def __init__(self, cfg, custom_clip, param, running_args=None):
+    def __init__(self, cfg, custom_clip, param, running_args):
         super().__init__()
         self.cfg = cfg
         self.loss_func = contrastive_loss
@@ -19,6 +19,8 @@ class Client(pl.LightningModule):
         
         self.val_acc_batch = []
         self.test_acc_batch = []
+        self.client_idx = running_args["client_idx"]
+        self.round_idx = running_args["round_idx"]
         
         self.mylogger = get_logger(f"{cfg.output_dir}/{cfg.logger.project}_{cfg.logger.name}.log")
         
@@ -46,15 +48,24 @@ class Client(pl.LightningModule):
         optimizer = hydra.utils.instantiate(self.cfg.optimizer, params_to_train)
         return optimizer
     
+    def on_train_epoch_start(self):
+        self.train_loss_list = []
+    
     def training_step(self, batch, batch_idx):
         image, label = batch
         image, label = image.to(self.device), label.to(self.device)
         
         model_ret = self.model(image, label)
         loss = model_ret["loss"]
-        self.mylogger.info(f"train_loss: {loss}")
+        self.train_loss_list.append(loss)
         
         return loss
+
+    def on_train_epoch_end(self):
+        # outputs 是一个由 validation_step 返回的字典组成的列表
+        avg_train_loss = torch.stack(self.train_loss_list).mean()
+        self.mylogger.info(f"Round[{self.round_idx}]-Client[{self.client_idx}] - Epoch[{self.current_epoch}/{self.trainer.max_epochs}] train_loss: {avg_train_loss}")
+        return 
     
     def test_step(self, batch, batch_idx):
         x, y = batch
@@ -66,13 +77,14 @@ class Client(pl.LightningModule):
         acc = (preds == y).float().mean()
         self.test_acc_batch.append(acc)
         
-        self.log('test_acc_batch', acc, prog_bar=True)
         return {'test_loss': loss, 'test_acc': acc}
     
     def on_test_epoch_end(self):
         avg_test_acc = torch.stack(self.test_acc_batch).mean()
         print(f"----- test_acc_epoch: {avg_test_acc} -----")
-        self.log('test_acc_epoch', avg_test_acc, prog_bar=True, logger=True)
+        self.mylogger.info(f"------------------------------")
+        self.mylogger.info(f'Round[{self.round_idx}] - test_acc: {avg_test_acc}')
+        self.mylogger.info(f"------------------------------")
     
     def validation_step(self, batch, batch_idx):
         x, y = batch
@@ -84,15 +96,12 @@ class Client(pl.LightningModule):
         acc = (preds == y).float().mean()
         self.val_acc_batch.append(acc)
         
-        self.log('val_acc_batch', acc, prog_bar=True)
         return {'val_loss': loss, 'val_acc': acc}
     
     def on_validation_epoch_end(self):
         # outputs 是一个由 validation_step 返回的字典组成的列表
         avg_val_acc = torch.stack(self.val_acc_batch).mean()
-        print(f"----- val_acc_epoch: {avg_val_acc} -----")
-        # Log average accuracy for the entire validation epoch
-        self.log('val_acc_epoch', avg_val_acc, prog_bar=True, logger=True)
+        self.mylogger.info(f'Round[{self.round_idx}]-Client[{self.client_idx}] - val_acc: {avg_val_acc}')
     
     
 

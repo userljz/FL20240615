@@ -14,7 +14,7 @@ trainer:
   _convert_: all
   max_epochs: 10
   log_every_n_steps: 1
-  check_val_every_n_epoch: 9
+  check_val_every_n_epoch: 10
   devices:
     - ${device.id}
   # devices: 1
@@ -25,7 +25,7 @@ trainer:
 
 optimizer:
   _target_: torch.optim.AdamW
-  lr: 1e-2
+  lr: 1e-4
   weight_decay: 2e-6
 
 # ===========================
@@ -39,8 +39,8 @@ logger:
 
 
 fl:
-  client_num: 20
-  select_client_num: 15
+  client_num: 5
+  select_client_num: 5
   round: 400
   dirichlet_alpha: 0.1
 

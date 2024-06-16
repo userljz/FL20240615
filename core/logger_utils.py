@@ -1,39 +1,3 @@
-# import logging
-# import os
-
-# logger = None
-
-
-# def get_logger(log_file_name, log_level=logging.DEBUG):
-#     global logger
-
-#     if logger is None:
-#         if log_file_name is None:
-#             raise ValueError
-#         # Create a logger
-#         logger = logging.getLogger(__name__)
-#         logger.setLevel(log_level)
-
-#         # Create a formatter and add it to the handlers
-#         formatter = logging.Formatter('%(asctime)s - %(name)s - %(message)s')
-
-#         # file handler
-#         log_file_path = os.path.join(os.getcwd(), log_file_name)
-#         file_handler = logging.FileHandler(log_file_path, mode='w')
-#         file_handler.setLevel(log_level)
-#         file_handler.setFormatter(formatter)
-#         logger.addHandler(file_handler)
-
-#         # console handler
-#         for handler in logger.handlers:
-#             if isinstance(handler, logging.StreamHandler):
-#                 handler.setFormatter(formatter)
-#                 handler.setLevel(log_level)
-#                 break
-        
-#     return logger
-
-
 import logging
 import os
 
@@ -75,6 +39,3 @@ def get_logger(log_file_name, log_level=logging.DEBUG):
     return logger
 
 
-def utils_log():
-    logger = get_logger('my_app.log')
-    logger.error('This is an error message from utils.py')
