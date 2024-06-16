@@ -1,6 +1,7 @@
 defaults:
   - dataset: cifar100
   - _self_
+  - Exp: exp_base
 
 device:
   cuda_visible_devices:  "0,1,2,3"
@@ -21,11 +22,10 @@ trainer:
   enable_model_summary: false
   precision: bf16-mixed  # 16-mixed  bf16-mixed  32
   logger: False
+  enable_checkpointing: Flase
 
 optimizer:
-  _target_: torch.optim.AdamW
-  lr: 1e-4
-  weight_decay: 2e-6
+
 
 # ===========================
 process_title: 20clients_15selected_alpha0.01_text2textW20

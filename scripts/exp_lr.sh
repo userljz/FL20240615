@@ -1,3 +1,1 @@
-cd ..
-
-python start.py --config_name exp_lr
+python start.py Exp=text_weight

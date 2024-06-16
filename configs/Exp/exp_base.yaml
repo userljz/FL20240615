@@ -1,6 +1,13 @@
+# @package _global_
 defaults:
-  - ../base
+  - override /dataset: cifar100
+  - _self_
 
 # ===========================
 process_title: exp_base
 # ===========================
+
+optimizer:
+  _target_: torch.optim.AdamW
+  lr: 1e-4
+  weight_decay: 2e-6

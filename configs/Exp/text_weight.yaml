@@ -5,16 +5,17 @@ defaults:
   
 
 device:
-  id: 3
+  id: 1
 
 optimizer:
   _target_: torch.optim.SGD
   lr: 2e-3
   momentum: 0.9
 
-logger:
-  wandb_enable: True
+clip:
+  text_to_text_weight: 5
+
 
 # ===========================
-process_title: exp_lr|SGD_Optim
+process_title: text_weight|text_weight=5
 # ===========================
