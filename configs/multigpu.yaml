@@ -5,8 +5,8 @@ defaults:
 
 device:
   cuda_visible_devices:  "0,1,2,3"
-  id: 1
-  cuda: cuda:${device.id}  # cpu  cuda:${device.id}
+  id: 0
+  cuda: cuda  # cpu  cuda:${device.id}
   float32_matmul_precision: medium
 
 trainer:
@@ -16,8 +16,8 @@ trainer:
   log_every_n_steps: 1
   check_val_every_n_epoch: ${trainer.max_epochs}
   devices:
-    - ${device.id}
-  # devices: 1
+    - 1
+    - 3
   accelerator: 'gpu'  # 'gpu' 'cpu'
   enable_model_summary: false
   precision: bf16-mixed  # 16-mixed  bf16-mixed  32
@@ -29,20 +29,20 @@ optimizer:
   weight_decay: 2e-6
 
 # ===========================
-process_title: 20clients_15selected_alpha0.01
+process_title: 20clients_15selected
 # ===========================
 
 logger:
   name: ${process_title}
   project: '20240616'
-  wandb_enable: True
+  wandb_enable: False
 
 
 fl:
   client_num: 20
   select_client_num: 15
   round: 400
-  dirichlet_alpha: 0.01
+  dirichlet_alpha: 0.1
 
 mode: train
 seed: 42

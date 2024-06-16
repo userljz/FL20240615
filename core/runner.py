@@ -4,6 +4,7 @@ import torch
 import os
 import hydra
 import wandb
+from omegaconf import OmegaConf
 
 from core.system import Client, Server
 from core.modules import DataModule, CustomCLIP
@@ -26,9 +27,10 @@ def client_fn(cfg, param, running_args):
 
 def train_fl(cfg):
     set_random_seed(seed=cfg.seed)
-    set_device(cfg.device)
+    # set_device(cfg.device)
     if cfg.logger.wandb_enable:
-        wandb.init(project=cfg.logger.project, name=cfg.logger.name, config=cfg)
+        config_dict = OmegaConf.to_container(cfg, resolve=True)
+        wandb.init(project=cfg.logger.project, name=cfg.logger.name, config=config_dict)
     
     server = Server(cfg)
     mylogger = get_logger(f"{cfg.output_dir}/{cfg.logger.project}_{cfg.logger.name}.log")

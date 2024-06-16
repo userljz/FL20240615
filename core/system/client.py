@@ -96,6 +96,8 @@ class Client(pl.LightningModule):
         self.mylogger.info(f"------------------------------")
         self.mylogger.info(f'Round[{self.round_idx}] - test_acc: {avg_test_acc}')
         self.mylogger.info(f"------------------------------")
+        if self.cfg.logger.wandb_enable:
+            wandb.log({f"Server_Test_Acc:": avg_test_acc})
     
     def on_validation_epoch_start(self):
         self.val_acc_batch = []
@@ -116,6 +118,8 @@ class Client(pl.LightningModule):
         # outputs 是一个由 validation_step 返回的字典组成的列表
         avg_val_acc = torch.stack(self.val_acc_batch).mean()
         self.mylogger.info(f'Round[{self.round_idx}]-Client[{self.client_idx}] - val_acc: {avg_val_acc}')
+        if self.cfg.logger.wandb_enable:
+            wandb.log({f"Client{self.client_idx}|Val_Acc:": avg_val_acc})
     
     
 
