@@ -1,6 +1,5 @@
 defaults:
   - dataset: cifar100
-  - system: lasp
   - _self_
 
 device:

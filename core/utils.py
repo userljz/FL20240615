@@ -5,6 +5,7 @@ from typing import Any, Dict
 import random
 import os
 import numpy as np
+from core.logger_utils import get_logger
 
 
 def set_parameters(net, parameters):
@@ -16,6 +17,14 @@ def set_parameters(net, parameters):
 
 def get_parameters(net):
     return [val.cpu().numpy() for _, val in net.state_dict().items()]
+
+
+def print_cfg(cfg):
+    mylogger = get_logger(f"{cfg.output_dir}/{cfg.logger.project}_{cfg.logger.name}.log")
+    mylogger.info("------ Config values: ------")
+    for key, value in cfg.items():
+        mylogger.info(f"{key}: {value}")
+    mylogger.info("----------------------------")
 
 
 @dataclass

@@ -8,7 +8,7 @@ from omegaconf import OmegaConf
 
 from core.system import Client, Server
 from core.modules import DataModule, CustomCLIP
-from core.utils import get_parameters, FitRes, set_random_seed, set_device, select_round_clients
+from core.utils import get_parameters, FitRes, set_random_seed, set_device, select_round_clients, print_cfg
 from core.logger_utils import get_logger
 
 
@@ -28,6 +28,7 @@ def client_fn(cfg, param, running_args):
 def train_fl(cfg):
     set_random_seed(seed=cfg.seed)
     # set_device(cfg.device)
+    print_cfg(cfg)
     if cfg.logger.wandb_enable:
         config_dict = OmegaConf.to_container(cfg, resolve=True)
         wandb.init(project=cfg.logger.project, name=cfg.logger.name, config=config_dict)
