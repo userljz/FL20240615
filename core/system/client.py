@@ -17,6 +17,7 @@ class Client(pl.LightningModule):
         self.param = param
         self.model = custom_clip
         
+        self.train_loss_list = []
         self.val_acc_batch = []
         self.test_acc_batch = []
         self.client_idx = running_args["client_idx"]
@@ -25,6 +26,9 @@ class Client(pl.LightningModule):
         self.mylogger = get_logger(f"{cfg.output_dir}/{cfg.logger.project}_{cfg.logger.name}.log")
         
     def on_train_start(self):
+        self.model = set_parameters(self.model, self.param)
+    
+    def on_test_start(self):
         self.model = set_parameters(self.model, self.param)
     
     def configure_optimizers(self):
@@ -65,8 +69,11 @@ class Client(pl.LightningModule):
         # outputs 是一个由 validation_step 返回的字典组成的列表
         avg_train_loss = torch.stack(self.train_loss_list).mean()
         self.mylogger.info(f"Round[{self.round_idx}]-Client[{self.client_idx}] - Epoch[{self.current_epoch}/{self.trainer.max_epochs}] train_loss: {avg_train_loss}")
-        return 
+        return
     
+    def on_test_epoch_start(self):
+        self.test_acc_batch = []
+        
     def test_step(self, batch, batch_idx):
         x, y = batch
         model_ret = self.model(x, y)
@@ -86,6 +93,9 @@ class Client(pl.LightningModule):
         self.mylogger.info(f'Round[{self.round_idx}] - test_acc: {avg_test_acc}')
         self.mylogger.info(f"------------------------------")
     
+    def on_validation_epoch_start(self):
+        self.val_acc_batch = []
+        
     def validation_step(self, batch, batch_idx):
         x, y = batch
         model_ret = self.model(x, y)
