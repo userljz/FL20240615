@@ -1,5 +1,5 @@
 dataset_name: cifar100
-batch_size: 32
+batch_size: 64
 
 dataset_root: "/home/ljz/dataset"
 # "/home/ljz/dataset"  "/Users/lijinze/Documents/Document_MacBookAir/code/dataset"
