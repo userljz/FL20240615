@@ -6,6 +6,7 @@ import pytorch_lightning as pl
 
 from core.modules import CustomCLIP, contrastive_loss
 from core.utils import set_parameters, get_parameters
+from core.logger_utils import get_logger
 
 
 class Client(pl.LightningModule):
@@ -18,6 +19,8 @@ class Client(pl.LightningModule):
         
         self.val_acc_batch = []
         self.test_acc_batch = []
+        
+        self.mylogger = get_logger(cfg.output_dir + cfg.logger.project + cfg.logger.name)
         
     def on_train_start(self):
         self.model = set_parameters(self.model, self.param)
@@ -49,7 +52,7 @@ class Client(pl.LightningModule):
         
         model_ret = self.model(image, label)
         loss = model_ret["loss"]
-        self.log("train_loss", loss)
+        self.mylogger.info(f"train_loss: {loss}")
         
         return loss
     

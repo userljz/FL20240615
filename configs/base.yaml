@@ -19,7 +19,6 @@ trainer:
     - ${device.id}
   # devices: 1
   accelerator: 'gpu'  # 'gpu' 'cpu'
-
   enable_model_summary: false
   precision: bf16-mixed  # 16-mixed  bf16-mixed  32
   logger: False
