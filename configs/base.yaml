@@ -5,7 +5,7 @@ defaults:
 
 device:
   cuda_visible_devices:  "0,1,2,3"
-  id: 1
+  id: 0
   cuda: cuda:${device.id}  # cpu  cuda:${device.id}
   float32_matmul_precision: medium
 
@@ -29,7 +29,7 @@ optimizer:
   weight_decay: 2e-6
 
 # ===========================
-process_title: 20clients_15selected_alpha0.01
+process_title: 20clients_15selected_alpha0.01_text2textW20
 # ===========================
 
 logger:
