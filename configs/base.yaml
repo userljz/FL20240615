@@ -22,7 +22,7 @@ trainer:
   enable_model_summary: false
   precision: bf16-mixed  # 16-mixed  bf16-mixed  32
   logger: False
-  enable_checkpointing: Flase
+  enable_checkpointing: False
 
 optimizer:
 

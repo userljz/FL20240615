@@ -9,7 +9,7 @@ device:
 
 optimizer:
   _target_: torch.optim.SGD
-  lr: 2e-3
+  lr: 2e-4
   momentum: 0.9
 
 logger:

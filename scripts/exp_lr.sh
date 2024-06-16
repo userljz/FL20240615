@@ -1,1 +1,1 @@
-python start.py Exp=text_weight
+python start.py Exp=exp_lr
