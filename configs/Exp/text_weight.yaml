@@ -5,17 +5,17 @@ defaults:
   
 
 device:
-  id: 1
+  id: 2
 
 optimizer:
-  _target_: torch.optim.SGD
-  lr: 2e-3
-  momentum: 0.9
+  _target_: torch.optim.AdamW
+  lr: 1e-4
+  weight_decay: 2e-6
 
 clip:
-  text_to_text_weight: 5
+  text_to_text_weight: 0.5
 
 
 # ===========================
-process_title: text_weight|text_weight=5
+process_title: text_weight|text_weight=0.5
 # ===========================
