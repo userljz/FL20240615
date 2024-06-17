@@ -1,5 +1,6 @@
 import logging
 import os
+from datetime import datetime
 
 logger = None
 
@@ -25,7 +26,12 @@ def get_logger(log_file_name, log_level=logging.DEBUG):
                 logger.removeHandler(handler)
 
         # File handler
-        log_file_path = os.path.join(os.getcwd(), log_file_name)
+        current_time = datetime.now().strftime("%Y%m%d-%H:%M:%S")
+        log_file_name = log_file_name.split('/')
+        dirpath, logname = log_file_name[0], log_file_name[1]
+        log_name_withtime = f"{dirpath}/{current_time}-{logname}"
+        log_file_path = os.path.join(os.getcwd(), log_name_withtime)
+        
         file_handler = logging.FileHandler(log_file_path, mode='w')
         file_handler.setLevel(log_level)
         file_handler.setFormatter(formatter)

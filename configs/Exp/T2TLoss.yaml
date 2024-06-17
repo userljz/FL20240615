@@ -5,7 +5,7 @@ defaults:
 
 
 device:
-  id: 0
+  id: 2
 
 optimizer:
   _target_: torch.optim.AdamW
@@ -13,8 +13,8 @@ optimizer:
   weight_decay: 2e-6
 
 # ===========================
-process_title: Anchor_noise|without
+process_title: T2TLoss|disable_t2tLoss
 # ===========================
 
 clip:
-  add_noise_for_anchors: False
+  text_to_text_enable: False
