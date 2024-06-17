@@ -28,7 +28,7 @@ def client_fn(cfg, param, running_args):
 def train_fl(cfg):
     print_cfg(cfg)
     set_random_seed(seed=cfg.seed)
-    # set_device(cfg.device)
+    set_device(cfg.device)
     if cfg.logger.wandb_enable:
         config_dict = OmegaConf.to_container(cfg, resolve=True)
         wandb.init(project=cfg.logger.project, name=cfg.logger.name, config=config_dict)

@@ -49,7 +49,7 @@ class Client(pl.LightningModule):
         for name, param in self.model.named_parameters():
             if param.requires_grad:
                 enabled.add(name)
-        print(f"Parameters to be updated: {enabled}")
+        self.mylogger.info(f"Parameters to be updated: {enabled}")
         
         optimizer = hydra.utils.instantiate(self.cfg.optimizer, params_to_train)
         return optimizer
@@ -92,7 +92,6 @@ class Client(pl.LightningModule):
     
     def on_test_epoch_end(self):
         avg_test_acc = torch.stack(self.test_acc_batch).mean()
-        print(f"----- test_acc_epoch: {avg_test_acc} -----")
         self.mylogger.info(f"------------------------------")
         self.mylogger.info(f'Round[{self.round_idx}] - test_acc: {avg_test_acc}')
         self.mylogger.info(f"------------------------------")

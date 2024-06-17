@@ -174,20 +174,20 @@ def load_dataloader_from_generate(dataset_name, model_name, batch_size, dirichle
         train_subset, val_subset = torch.utils.data.random_split(train_img_label_list, [train_size, val_size])
         train_loader = torch.utils.data.DataLoader(
             train_subset,
-            batch_size=batch_size, shuffle=True, num_workers=7, pin_memory=True)
+            batch_size=batch_size, shuffle=True, num_workers=32, pin_memory=True)
         val_loader = torch.utils.data.DataLoader(
             val_subset,
-            batch_size=batch_size, shuffle=False, num_workers=7, pin_memory=True)
+            batch_size=batch_size, shuffle=False, num_workers=32, pin_memory=True)
         test_loader = torch.utils.data.DataLoader(
             test_img_label_list,
-            batch_size=batch_size, shuffle=False, num_workers=7, pin_memory=True)
+            batch_size=batch_size, shuffle=False, num_workers=32, pin_memory=True)
         
         return [train_loader], [val_loader], test_loader
     
     elif dataloader_num > 1:
         test_loader = torch.utils.data.DataLoader(
             test_img_label_list,
-            batch_size=batch_size, shuffle=False, num_workers=7, pin_memory=True)
+            batch_size=batch_size, shuffle=False, num_workers=32, pin_memory=True)
         
         # return non-iid multi-clients trainloaders
         labels = np.array([i[1] for i in train_img_label_list])
@@ -207,8 +207,8 @@ def load_dataloader_from_generate(dataset_name, model_name, batch_size, dirichle
             train_subset, val_subset = torch.utils.data.random_split(trainset, [train_size, val_size])
             
             # Create DataLoader for training and validation sets
-            train_loaders.append(DataLoader(train_subset, batch_size=batch_size, shuffle=True))
-            val_loaders.append(DataLoader(val_subset, batch_size=batch_size, shuffle=False))
+            train_loaders.append(DataLoader(train_subset, batch_size=batch_size, shuffle=True, num_workers=32, pin_memory=True))
+            val_loaders.append(DataLoader(val_subset, batch_size=batch_size, shuffle=False, num_workers=32, pin_memory=True))
         
         
         return train_loaders, val_loaders, test_loader
