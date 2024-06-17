@@ -3,15 +3,17 @@ defaults:
   - override /dataset: cifar100
   - _self_
 
+# ===========================
+process_title: text_correction|Without
+# ===========================
 
 device:
-  id: 1
-
+  id: 3
+  
 optimizer:
   _target_: torch.optim.AdamW
   lr: 1e-4
   weight_decay: 2e-6
 
-# ===========================
-process_title: exp_base
-# ===========================
+clip:
+  text_correction: False

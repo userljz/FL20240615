@@ -4,12 +4,12 @@ defaults:
   - _self_
 
 # ===========================
-process_title: AdamW|lr=1e-3
+process_title: AdamW|lr=1e-4
 # ===========================
 
 optimizer:
   _target_: torch.optim.AdamW
-  lr: 1e-3
+  lr: 1e-4
   weight_decay: 2e-6
 
 device:
