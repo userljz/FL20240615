@@ -5,16 +5,14 @@ defaults:
   
 
 device:
-  id: 3
+  id: 0
 
 optimizer:
   _target_: torch.optim.SGD
-  lr: 2e-4
+  lr: 1e-2
   momentum: 0.9
 
-logger:
-  wandb_enable: True
 
 # ===========================
-process_title: exp_lr|SGD_Optim
+process_title: exp_lr|lr=1e-2
 # ===========================
