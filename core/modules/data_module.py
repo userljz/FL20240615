@@ -28,26 +28,27 @@ def count_labels(data_loader):
     return label_counts
 
 class DataModule(pl.LightningDataModule):
-    def __init__(self, cfg, client_idx):
+    def __init__(self, cfg, client_idx, train_loaders, val_loaders, test_loader):
         super().__init__()
         self.cfg = cfg
         self.client_idx = client_idx
-        self.train_loaders, self.val_loaders, self.test_loader = [], [], None
+        self.train_loaders, self.val_loaders, self.test_loader = train_loaders, val_loaders, test_loader
         
     def setup(self, stage=None):
-        dataset_name = self.cfg.dataset.dataset_name
-        model_name = self.cfg.clip.backbone
-        batch_size = self.cfg.dataset.batch_size
-        client_num = self.cfg.fl.client_num
-        dataset_root = self.cfg.dataset.dataset_root
-        dirichlet_alpha = self.cfg.fl.dirichlet_alpha
+        # dataset_name = self.cfg.dataset.dataset_name
+        # model_name = self.cfg.clip.backbone
+        # batch_size = self.cfg.dataset.batch_size
+        # client_num = self.cfg.fl.client_num
+        # dataset_root = self.cfg.dataset.dataset_root
+        # dirichlet_alpha = self.cfg.fl.dirichlet_alpha
+        #
+        # self.train_loaders, self.val_loaders, self.test_loader = load_dataloader_from_generate(
+        #     dataset_name, model_name, batch_size, dirichlet_alpha, dataloader_num=client_num, dataset_root=dataset_root)
         
-        self.train_loaders, self.val_loaders, self.test_loader = load_dataloader_from_generate(
-            dataset_name, model_name, batch_size, dirichlet_alpha, dataloader_num=client_num, dataset_root=dataset_root)
-        
-        label_counts = count_labels(self.train_loaders)
+        # label_counts = count_labels(self.train_loaders)
         # for key, value in label_counts.items():
         #     self.trainer.logger.log_metrics(f"[{key}]: {value}")
+        pass
             
     def train_dataloader(self):
         return self.train_loaders[self.client_idx]

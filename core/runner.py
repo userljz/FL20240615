@@ -10,6 +10,7 @@ from core.system import Client, Server
 from core.modules import DataModule, CustomCLIP
 from core.utils import get_parameters, FitRes, set_random_seed, set_device, select_round_clients, print_cfg
 from core.logger_utils import get_logger
+from core.data_utils import load_dataloader_from_generate
 
 
 def client_fn(cfg, param, running_args):
@@ -37,6 +38,14 @@ def train_fl(cfg):
     mylogger = get_logger(f"{cfg.output_dir}/{cfg.logger.project}_{cfg.logger.name}.log")
     running_args = {}
     
+    train_loaders, val_loaders, test_loader = load_dataloader_from_generate(dataset_name=cfg.dataset.dataset_name,
+                                                                            model_name=cfg.clip.backbone,
+                                                                            batch_size=cfg.dataset.batch_size,
+                                                                            dirichlet_alpha=cfg.fl.dirichlet_alpha,
+                                                                            dataloader_num=cfg.fl.client_num,
+                                                                            dataset_root=cfg.dataset.dataset_root)
+    
+    
     # ===== FL Communication Start =====
     for round_i in range(1, cfg.fl.round + 1):
         mylogger.info(f"===== Round-{round_i} Start =====")
@@ -58,7 +67,7 @@ def train_fl(cfg):
         for client_idx in client_list_use:
             mylogger.info(f"\n===== Round-{round_i}|Client-{client_idx} Start =====")
             running_args["client_idx"] = client_idx
-            datamodule = DataModule(cfg, client_idx)
+            datamodule = DataModule(cfg, client_idx, train_loaders, val_loaders, test_loader)
             client = client_fn(cfg, param, running_args)
             trainer = hydra.utils.instantiate(cfg.trainer, num_sanity_val_steps=num_sanity_val_steps)
             trainer.fit(client, datamodule=datamodule)
