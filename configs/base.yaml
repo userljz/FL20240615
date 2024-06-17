@@ -59,4 +59,6 @@ clip:
   text_to_text_enable: True
   text_to_text_weight: 1
 
+  add_noise_for_anchors: True
+
 dtype: torch.float32

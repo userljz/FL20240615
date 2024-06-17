@@ -93,9 +93,10 @@ class CustomCLIP(nn.Module):
             class_text_features = self.prompt_learner.class_text_features
             class_text_features = class_text_features / class_text_features.norm(dim=-1, keepdim=True)
 
-        if torch.rand(1).item() < 0.5:
-            noise = 0.05 * torch.randn_like(class_text_features)
-            class_text_features.add_(noise)
+        if self.cfg.clip.add_noise_for_anchors:
+            if torch.rand(1).item() < 0.5:
+                noise = 0.05 * torch.randn_like(class_text_features)
+                class_text_features.add_(noise)
         
         # 待训练的 Text Embeddings 称为 prompts
         prompts = self.prompt_learner()
