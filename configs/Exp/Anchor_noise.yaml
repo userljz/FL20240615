@@ -13,8 +13,11 @@ optimizer:
   weight_decay: 2e-6
 
 # ===========================
-process_title: Anchor_noise|without
+process_title: Anchor_noise|without_Alpha0.1
 # ===========================
 
 clip:
   add_noise_for_anchors: False
+
+fl:
+  dirichlet_alpha: 0.1
