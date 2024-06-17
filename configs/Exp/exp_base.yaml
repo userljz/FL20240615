@@ -5,7 +5,7 @@ defaults:
 
 
 device:
-  id: 1
+  id: 0
 
 optimizer:
   _target_: torch.optim.AdamW
