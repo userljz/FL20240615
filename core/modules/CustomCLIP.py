@@ -100,7 +100,7 @@ class CustomCLIP(nn.Module):
         
         # 待训练的 Text Embeddings 称为 prompts
         prompts = self.prompt_learner()
-        text_features = self.text_encoder(prompts, self.prompt_learner.tokenized_prompts_all_c_)
+        text_features = self.text_encoder(prompts, self.prompt_learner.tokenized_prompts)
 
         if self.cfg.clip.text_correction:
             w = self.prompt_learner.w
