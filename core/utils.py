@@ -8,15 +8,29 @@ import numpy as np
 from core.logger_utils import get_logger
 
 
+# def set_parameters(net, parameters):
+#     params_dict = zip(net.state_dict().keys(), parameters)
+#     state_dict = OrderedDict({k: torch.tensor(v) for k, v in params_dict})
+#     net.load_state_dict(state_dict, strict=True)
+#     return net
+
+
 def set_parameters(net, parameters):
-    params_dict = zip(net.state_dict().keys(), parameters)
-    state_dict = OrderedDict({k: torch.tensor(v) for k, v in params_dict})
-    net.load_state_dict(state_dict, strict=True)
+    # 将参数和 keys 对应起来
+    state_dict = net.state_dict()
+    for name, val in parameters:
+        state_dict[name] = torch.tensor(val)
+    
+    # 加载新的 state_dict，strict=False 允许我们只更新部分参数
+    net.load_state_dict(state_dict, strict=False)
     return net
 
 
+# def get_parameters(net):
+#     return [val.cpu().numpy() for _, val in net.state_dict().items()]
+
 def get_parameters(net):
-    return [val.cpu().numpy() for _, val in net.state_dict().items()]
+    return [(name, val.cpu().numpy()) for name, val in net.named_parameters() if val.requires_grad]
 
 
 def print_cfg(cfg):

@@ -13,14 +13,13 @@ from core.logger_utils import get_logger
 from core.data_utils import load_dataloader_from_generate
 
 
-def client_fn(cfg, param, running_args):
+def client_fn(cfg, param, running_args, custom_clip):
     """
     Instantiate the Client for each Round
     :param cfg: Config
     :param param: 需要 Client 端进行实例化时初始化的参数
     :return: Client
     """
-    custom_clip = CustomCLIP(cfg)
     client = Client(cfg, custom_clip, param, running_args)
     
     return client
@@ -44,7 +43,7 @@ def train_fl(cfg):
                                                                             dirichlet_alpha=cfg.fl.dirichlet_alpha,
                                                                             dataloader_num=cfg.fl.client_num,
                                                                             dataset_root=cfg.dataset.dataset_root)
-    
+    custom_clip = CustomCLIP(cfg)
     
     # ===== FL Communication Start =====
     for round_i in range(1, cfg.fl.round + 1):
@@ -68,7 +67,7 @@ def train_fl(cfg):
             mylogger.info(f"\n===== Round-{round_i}|Client-{client_idx} Start =====")
             running_args["client_idx"] = client_idx
             datamodule = DataModule(cfg, client_idx, train_loaders, val_loaders, test_loader)
-            client = client_fn(cfg, param, running_args)
+            client = client_fn(cfg, param, running_args, custom_clip)
             trainer = hydra.utils.instantiate(cfg.trainer, num_sanity_val_steps=num_sanity_val_steps)
             trainer.fit(client, datamodule=datamodule)
             
@@ -83,7 +82,7 @@ def train_fl(cfg):
         param = server.server_conduct(results)
         
         # ===== Test Global =====
-        client_agg = client_fn(cfg, param, running_args)
+        client_agg = client_fn(cfg, param, running_args, custom_clip)
         datamodule = DataModule(cfg, 1, train_loaders, val_loaders, test_loader)
         trainer = hydra.utils.instantiate(cfg.trainer)
         trainer.test(client_agg, datamodule=datamodule)

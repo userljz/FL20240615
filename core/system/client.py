@@ -22,6 +22,7 @@ class Client(pl.LightningModule):
         self.train_loss_list = []
         self.val_acc_batch = []
         self.test_acc_batch = []
+        self.running_args = running_args
         self.client_idx = running_args["client_idx"]
         self.round_idx = running_args["round_idx"]
         
@@ -45,11 +46,12 @@ class Client(pl.LightningModule):
             else:
                 param.requires_grad_(False)
         
-        enabled = set()
-        for name, param in self.model.named_parameters():
-            if param.requires_grad:
-                enabled.add(name)
-        self.mylogger.info(f"Parameters to be updated: {enabled}")
+        if self.round_idx == 1:
+            enabled = set()
+            for name, param in self.model.named_parameters():
+                if param.requires_grad:
+                    enabled.add(name)
+            self.mylogger.info(f"Parameters to be updated: {enabled}")
         
         optimizer = hydra.utils.instantiate(self.cfg.optimizer, params_to_train)
         return optimizer

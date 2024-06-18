@@ -54,7 +54,8 @@ clip:
   ctx_init: "a photo of a"
 
   text_correction: True
-  templete_prompts: ["a photo of a {}."]
+  templete_prompts:
+    - "a photo of a {}."
 
   text_to_text_enable: True
   text_to_text_weight: 1
