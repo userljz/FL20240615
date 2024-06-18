@@ -109,7 +109,7 @@ class CustomCLIP(nn.Module):
         text_features = text_features / text_features.norm(dim=-1, keepdim=True)
         text_features = text_features.unsqueeze(0)
 
-        label = torch.arange(self.prompt_learner.n_cls_all, device=class_text_features.device, dtype=torch.long).unsqueeze(0).expand(class_text_features.size(0), -1)
+        label = torch.arange(self.prompt_learner.n_cls, device=class_text_features.device, dtype=torch.long).unsqueeze(0).expand(class_text_features.size(0), -1)
         
         ret_dict = self.loss(text_features, class_text_features, label, t=self.logit_scale)
         return ret_dict["loss"]

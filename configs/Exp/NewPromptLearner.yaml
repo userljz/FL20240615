@@ -5,7 +5,7 @@ defaults:
 
 
 device:
-  id: 1
+  id: 3
 
 optimizer:
   _target_: torch.optim.AdamW
@@ -13,11 +13,8 @@ optimizer:
   weight_decay: 2e-6
 
 # ===========================
-process_title: Anchor_noise|without_Alpha0.1
+process_title: NewPromptLearner|no_anchor_noise
 # ===========================
 
 clip:
   add_noise_for_anchors: False
-
-fl:
-  dirichlet_alpha: 0.1
