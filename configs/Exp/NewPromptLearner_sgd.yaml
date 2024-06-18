@@ -8,12 +8,13 @@ device:
   id: 0
 
 optimizer:
-  _target_: torch.optim.AdamW
-  lr: 1e-4
-  weight_decay: 2e-6
+  _target_: torch.optim.SGD
+  lr: 0.005
+  momentum: 0.9
+  weight_decay: 1e-4
 
 # ===========================
-process_title: NewPromptLearner|MoreTempletes
+process_title: NewPromptLearner_sgd|SGD
 # ===========================
 
 clip:

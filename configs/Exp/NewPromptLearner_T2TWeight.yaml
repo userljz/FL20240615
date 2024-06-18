@@ -5,7 +5,7 @@ defaults:
 
 
 device:
-  id: 0
+  id: 2
 
 optimizer:
   _target_: torch.optim.AdamW
@@ -13,7 +13,7 @@ optimizer:
   weight_decay: 2e-6
 
 # ===========================
-process_title: NewPromptLearner|MoreTempletes
+process_title: NewPromptLearner_T2TWeight|Weight0.5
 # ===========================
 
 clip:
@@ -37,3 +37,4 @@ clip:
     'a photo of the small {}.',
     'a photo of the big {}.',
     ]
+  text_to_text_weight: 0.5

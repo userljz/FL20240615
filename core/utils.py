@@ -30,7 +30,7 @@ def set_parameters(net, parameters):
 #     return [val.cpu().numpy() for _, val in net.state_dict().items()]
 
 def get_parameters(net):
-    return [(name, val.cpu().numpy()) for name, val in net.named_parameters() if val.requires_grad]
+    return [(name, val.detach().cpu().numpy()) for name, val in net.named_parameters() if val.requires_grad]
 
 
 def print_cfg(cfg):
