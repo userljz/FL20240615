@@ -40,7 +40,7 @@ logger:
 fl:
   client_num: 20
   select_client_num: 15
-  round: 400
+  round: 100
   dirichlet_alpha: 0.01
 
 mode: train

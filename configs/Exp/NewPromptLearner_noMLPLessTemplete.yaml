@@ -1,0 +1,23 @@
+# @package _global_
+defaults:
+  - override /dataset: cifar100
+  - _self_
+
+
+device:
+  id: 3
+
+optimizer:
+  _target_: torch.optim.AdamW
+  lr: 1e-4
+  weight_decay: 2e-6
+
+# ===========================
+process_title: NewPromptLearner_noMLPLessTemplete|
+# ===========================
+
+clip:
+  templete_prompts: [
+    'a photo of a {}.'
+    ]
+  use_mlp: False

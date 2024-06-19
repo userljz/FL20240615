@@ -1,0 +1,30 @@
+# @package _global_
+defaults:
+  - override /dataset: cifar100
+  - _self_
+
+
+device:
+  id: 1
+
+optimizer:
+  _target_: torch.optim.AdamW
+  lr: 1e-4
+  weight_decay: 2e-6
+
+# ===========================
+process_title: LongLocalEpoch|WithNoise_50Epoch
+# ===========================
+
+clip:
+  templete_prompts: [
+    'a photo of a {}.'
+    ]
+  text_to_text_weight: 20
+  add_noise_for_anchors: True
+
+trainer:
+  max_epochs: 50
+
+fl:
+  round: 40
