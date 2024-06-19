@@ -67,29 +67,32 @@ class PromptLearner(nn.Module):
         self.mylogger.info(f'Num classes used for LASP: {len(all_classnames)}')
         
         all_class_text_features = []
-        for c_init in template_prompts:
-            prompts = [c_init.format(name) for name in all_classnames]
+        if cfg.clip.use_description_ref:
+            # 使用描述性的 text reference，引入RFHL
+            prompts = []
+            for ref_idx in range(len(template_prompts)):
+                prompts.append(template_prompts[ref_idx].format(all_classnames[ref_idx]))
             tokenized_prompts_all_c = torch.cat([clip.tokenize(p) for p in prompts]).to(self.device)  # (n_cls, n_tkn)
             text_encoder_model.to(self.device)
             with torch.no_grad():
                 embedding_all_cls = clip_model.token_embedding(tokenized_prompts_all_c).to(self.device).type(dtype)
                 class_text_features = text_encoder_model(embedding_all_cls, tokenized_prompts_all_c).type(dtype)
                 all_class_text_features.append(class_text_features)
+
+        else:
+            for c_init in template_prompts:
+                prompts = [c_init.format(name) for name in all_classnames]
+                tokenized_prompts_all_c = torch.cat([clip.tokenize(p) for p in prompts]).to(self.device)  # (n_cls, n_tkn)
+                text_encoder_model.to(self.device)
+                with torch.no_grad():
+                    embedding_all_cls = clip_model.token_embedding(tokenized_prompts_all_c).to(self.device).type(dtype)
+                    class_text_features = text_encoder_model(embedding_all_cls, tokenized_prompts_all_c).type(dtype)
+                    all_class_text_features.append(class_text_features)
             
         self.register_buffer("class_text_features", torch.stack(all_class_text_features, dim=0))
         self.mylogger.info(f'class_text_features.shape: {self.class_text_features.shape}')
         
-        # prompts = [prompt_prefix + " " + name + "." for name in all_classnames]
-        # tokenized_prompts_all_c_ = torch.cat([clip.tokenize(p) for p in prompts]).to(self.device)  # (n_cls, n_tkn)
-        # with torch.no_grad():
-        #     embedding = clip_model.token_embedding(tokenized_prompts_all_c_).type(dtype)
         
-        # self.register_buffer("token_prefix_all", embedding[:, :1, :])  # SOS
-        # self.register_buffer("token_suffix_all", embedding[:, 1 + n_ctx:, :])  # CLS, EOS
-        
-        # self.tokenized_prompts_all = tokenized_prompts_all_c
-        # self.tokenized_prompts_all_c_ = tokenized_prompts_all_c_
-        # self.n_cls_all = len(prompts)
     
     def construct_prompts(self, ctx, prefix, suffix, label=None):
         # dim0 is either batch_size (during training) or n_cls (during testing)
