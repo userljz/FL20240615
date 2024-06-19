@@ -91,6 +91,7 @@ class CustomCLIP(nn.Module):
         
         self.cfg = cfg
         self.loss = contrastive_loss
+        self.text2text_loss = text2text_loss
 
     def forward_text_to_text(self):
         with torch.no_grad():
@@ -115,8 +116,7 @@ class CustomCLIP(nn.Module):
         # text_features = text_features.unsqueeze(0)
 
         # label = torch.arange(self.prompt_learner.n_cls, device=class_text_features.device, dtype=torch.long).unsqueeze(0).expand(class_text_features.size(0), -1)
-        print(f"{text_features.shape = }")
-        print(f"{class_text_features.shape = }")
+        
         mse_loss = self.text2text_loss(text_features, class_text_features)
         
         return mse_loss
