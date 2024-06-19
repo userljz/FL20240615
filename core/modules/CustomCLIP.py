@@ -124,7 +124,8 @@ class CustomCLIP(nn.Module):
             loss_dict = self.contrastive_loss(text_features, class_text_features, label, t=self.logit_scale)
             loss = loss_dict['loss']
         elif self.cfg.clip.TextTextLoss == "SupConLoss":
-            loss = self.SupConLoss(self.cfg, text_features, class_text_features, label)
+            ret_dict = self.SupConLoss(self.cfg, text_features, class_text_features, label)
+            loss, logits = ret_dict["loss"], ret_dict["logits"]
         
         else:
             raise ValueError
