@@ -15,7 +15,7 @@ optimizer:
   weight_decay: 1e-2
 
 # ===========================
-process_title: 062002_cifar100_E10_LR1e-2
+process_title: 062003_cifar100_E10_LR1e-2
 # ===========================
 
 trainer:

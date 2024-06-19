@@ -31,3 +31,6 @@ fl:
 
 trainer:
   max_epochs: 2
+
+clip:
+  img_to_ref_enable: True
