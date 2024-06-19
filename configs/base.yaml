@@ -28,7 +28,7 @@ optimizer:
 
 
 # ===========================
-process_title: 20clients_15selected_alpha0.01_text2textW20
+process_title: "default"
 # ===========================
 
 logger:
@@ -66,5 +66,7 @@ clip:
   ImageTextLoss: contrastive_loss  # t2t_mseloss  SupConLoss  contrastive_loss
   TextTextLoss: contrastive_loss  # t2t_mseloss  SupConLoss  contrastive_loss
   loss_margin: 0.2
+
+  img_to_ref_enable: False
 
 dtype: torch.float32

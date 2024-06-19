@@ -159,6 +159,14 @@ class CustomCLIP(nn.Module):
 
         if self.cfg.clip.text_to_text_enable:
             loss = loss + float(self.cfg.clip.text_to_text_weight) * self.forward_text_to_text()
+        
+        if self.cfg.clip.img_to_ref_enable:
+            with torch.no_grad():
+                # 获得 Frozen text Embedding 作为 Anchor(Constraint)
+                class_text_features = self.prompt_learner.class_text_features
+                class_text_features = class_text_features / class_text_features.norm(dim=-1, keepdim=True)
+            img_to_ref_loss = self.contrastive_loss(image_features, class_text_features, label, t=self.logit_scale)
+            loss = loss + img_to_ref_loss
 
         return {"loss": loss, "logits": logits}
         

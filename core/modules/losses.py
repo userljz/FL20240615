@@ -10,8 +10,8 @@ def contrastive_loss(visual_features, class_prototypes, labels=None, t=0.07):
     logits = math.exp(t) * visual_features @ transpose(class_prototypes)
     if labels is not None:
         loss = F.cross_entropy(logits, labels)
-        print(f"{loss.shape = }")
-        print(f"{logits.shape = }")
+        # print(f"{loss.shape = }")
+        # print(f"{logits.shape = }")
         return {"loss": loss, "logits": logits}
     else:
         return {"loss": None, "logits": logits}
@@ -58,6 +58,6 @@ def SupConLoss(cfg, visual_features, class_prototypes, labels):
     logits_per_image = torch.clamp(logits_per_image, min=0)
     loss = torch.sum(logits_per_image)  # [1,]
 
-    print(f"{loss.shape = }")
-    print(f"{logits.shape = }")
+    # print(f"{loss.shape = }")
+    # print(f"{logits.shape = }")
     return {"loss": loss, "logits": logits}
