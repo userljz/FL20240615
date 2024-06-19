@@ -50,6 +50,7 @@ output_dir: outputs
 
 clip:
   backbone: ViT-B/32
+  use_mlp: True
   mlp_hiddenlayer_num: 2048
   ctx_init: "a photo of a"
 

@@ -33,6 +33,7 @@ class TextEncoder(nn.Module):
 class ClipModel_from_generated(nn.Module):
     def __init__(self, cfg):
         super(ClipModel_from_generated, self).__init__()
+        self.cfg = cfg
         
         if cfg.clip.backbone == 'RN50':
             img_emb_length = 1024
@@ -56,18 +57,22 @@ class ClipModel_from_generated(nn.Module):
             fc_input_dim = img_emb_length
             fc_output_dim = img_emb_length
         else:
-            print('Please specify the img_emb_length')
+            raise ValueError('Please specify the img_emb_length')
         
-        mlp_hiddenlayer_num = cfg.clip.mlp_hiddenlayer_num
-        
-        self.mlp = nn.Sequential(
-            nn.Linear(fc_input_dim, mlp_hiddenlayer_num),
-            nn.ReLU(),
-            nn.Linear(mlp_hiddenlayer_num, fc_output_dim)
-        ).to(cfg.device.cuda)
+        if cfg.clip.use_mlp:
+            mlp_hiddenlayer_num = cfg.clip.mlp_hiddenlayer_num
+            self.mlp = nn.Sequential(
+                nn.Linear(fc_input_dim, mlp_hiddenlayer_num),
+                nn.ReLU(),
+                nn.Linear(mlp_hiddenlayer_num, fc_output_dim)
+            ).to(cfg.device.cuda)
     
     def forward(self, img_emb):
-        image_features = self.mlp(img_emb)
+        if self.cfg.clip.use_mlp:
+            image_features = self.mlp(img_emb)
+        else:
+            image_features = img_emb
+            
         return image_features
 
 
