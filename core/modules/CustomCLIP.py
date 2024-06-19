@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from clip import clip
-from core.modules.losses import contrastive_loss, text2text_loss
+from core.modules.losses import contrastive_loss, text2text_loss, SupConLoss
 from core.modules.PromptLearner import PromptLearner
 from core.utils import dtype_mapping
 
@@ -90,8 +90,9 @@ class CustomCLIP(nn.Module):
         self.logit_scale = origin_clip.logit_scale
         
         self.cfg = cfg
-        self.loss = contrastive_loss
+        self.contrastive_loss = contrastive_loss
         self.text2text_loss = text2text_loss
+        self.SupConLoss = SupConLoss
 
     def forward_text_to_text(self):
         with torch.no_grad():
@@ -117,11 +118,16 @@ class CustomCLIP(nn.Module):
 
         label = torch.arange(self.prompt_learner.n_cls, device=class_text_features.device, dtype=torch.long).unsqueeze(0).expand(class_text_features.size(0), -1)
         
-        if self.cfg.clip.t2t_mseloss:
+        if self.cfg.clip.TextTextLoss == "t2t_mseloss":
             loss = self.text2text_loss(text_features, class_text_features)
-        else:
-            loss_dict = self.loss(text_features, class_text_features, label, t=self.logit_scale)
+        elif self.cfg.clip.TextTextLoss == "contrastive_loss":
+            loss_dict = self.contrastive_loss(text_features, class_text_features, label, t=self.logit_scale)
             loss = loss_dict['loss']
+        elif self.cfg.clip.TextTextLoss == "SupConLoss":
+            loss = self.SupConLoss(self.cfg, text_features, class_text_features, label)
+        
+        else:
+            raise ValueError
         
         return loss
 
@@ -139,8 +145,16 @@ class CustomCLIP(nn.Module):
             text_features = text_features + w
         text_features = text_features / text_features.norm(dim=-1, keepdim=True)
         
-        ret_dict = self.loss(image_features, text_features, label, t=self.logit_scale)
-        loss, logits = ret_dict["loss"], ret_dict["logits"]
+        if self.cfg.clip.ImageTextLoss == "contrastive_loss":
+            ret_dict = self.contrastive_loss(image_features, text_features, label, t=self.logit_scale)
+            loss, logits = ret_dict["loss"], ret_dict["logits"]
+        
+        elif self.cfg.clip.ImageTextLoss == "SupConLoss":
+            ret_dict = self.SupConLoss(self.cfg, image_features, text_features, label)
+            loss, logits = ret_dict["loss"], ret_dict["logits"]
+        
+        else:
+            raise ValueError
 
         if self.cfg.clip.text_to_text_enable:
             loss = loss + float(self.cfg.clip.text_to_text_weight) * self.forward_text_to_text()

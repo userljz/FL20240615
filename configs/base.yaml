@@ -63,6 +63,8 @@ clip:
 
   add_noise_for_anchors: True
   use_description_ref: False
-  t2t_mseloss: False
+  ImageTextLoss: contrastive_loss  # t2t_mseloss  SupConLoss  contrastive_loss
+  TextTextLoss: contrastive_loss  # t2t_mseloss  SupConLoss  contrastive_loss
+  loss_margin: 0.2
 
 dtype: torch.float32

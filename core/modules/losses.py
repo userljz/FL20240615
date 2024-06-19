@@ -1,5 +1,6 @@
 import torch.nn.functional as F
 import math
+import torch
 
 def transpose(x):
     return x.t() if x.dim() == 2 else x.permute(0, 2, 1)
@@ -29,3 +30,30 @@ def text2text_loss(text_feat, ref_feat):
     
     return l2loss
     
+    
+def SupConLoss(cfg, visual_features, class_prototypes, labels):
+    """Supervised Contrastive Learning:.
+    It also supports the unsupervised contrastive loss in SimCLR"""
+    
+    """
+    Args:
+        features: hidden vector of shape [bsz, image_feats].
+        labels: ground truth of shape [bsz].
+
+    Returns:
+        A loss scalar.
+    """
+    # --- generate one-hot target ---
+    visual_features, class_prototypes = visual_features.squeeze(), class_prototypes.squeeze()
+    num_classes = len(cfg.dataset.classnames)
+    target = F.one_hot(labels, num_classes).to(cfg.device.cuda)
+
+    logits_per_image = 100 * visual_features @ transpose(class_prototypes)  # [bsz, num_class]
+    logits = logits_per_image
+
+    logits_per_image = logits_per_image / logits_per_image.norm(dim=-1, keepdim=True)
+    logits_per_image = torch.where(target == 1, 1 - logits_per_image, logits_per_image - cfg.clip.loss_margin)
+    logits_per_image = torch.clamp(logits_per_image, min=0)
+    loss = torch.sum(logits_per_image)  # [1,]
+
+    return {"loss": loss, "logits": logits}
