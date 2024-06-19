@@ -1,0 +1,29 @@
+# @package _global_
+defaults:
+  - override /dataset: OrganAMNIST
+  - _self_
+
+
+device:
+  cuda_visible_devices:  "0,1,2,3,4,5,6,7"
+  id: 4
+
+
+
+# ===========================
+process_title: 062004_OrganA_SupConLoss_margin01
+# ===========================
+
+optimizer:
+  _target_: torch.optim.SGD
+  lr: 0.005
+  weight_decay: 1e-4
+  momentum: 0.9
+  
+clip:
+  ImageTextLoss: SupConLoss  # t2t_mseloss  SupConLoss  contrastive_loss
+  TextTextLoss: SupConLoss  # t2t_mseloss  SupConLoss  contrastive_loss
+  loss_margin: 0.1
+  templete_prompts: [
+    'a photo of a {}.'
+    ]
