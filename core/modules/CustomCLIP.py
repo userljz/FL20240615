@@ -113,13 +113,17 @@ class CustomCLIP(nn.Module):
             text_features = text_features + w
 
         text_features = text_features / text_features.norm(dim=-1, keepdim=True)
-        # text_features = text_features.unsqueeze(0)
+        text_features = text_features.unsqueeze(0)
 
-        # label = torch.arange(self.prompt_learner.n_cls, device=class_text_features.device, dtype=torch.long).unsqueeze(0).expand(class_text_features.size(0), -1)
+        label = torch.arange(self.prompt_learner.n_cls, device=class_text_features.device, dtype=torch.long).unsqueeze(0).expand(class_text_features.size(0), -1)
         
-        mse_loss = self.text2text_loss(text_features, class_text_features)
+        if self.cfg.clip.t2t_mseloss:
+            loss = self.text2text_loss(text_features, class_text_features)
+        else:
+            loss_dict = self.loss(text_features, class_text_features, label, t=self.logit_scale)
+            loss = loss_dict['loss']
         
-        return mse_loss
+        return loss
 
     def forward(self, image, label=None):
         tokenized_prompts = self.prompt_learner.tokenized_prompts

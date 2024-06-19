@@ -204,7 +204,10 @@ def load_dataloader_from_generate(dataset_name, model_name, batch_size, dirichle
             val_size = int(len(trainset) * 0.2) + 1
             train_size = len(trainset) - val_size
             
-            train_subset, val_subset = torch.utils.data.random_split(trainset, [train_size, val_size])
+            if train_size > 0:
+                train_subset, val_subset = torch.utils.data.random_split(trainset, [train_size, val_size])
+            else:
+                train_subset, val_subset = trainset, trainset
             
             # Create DataLoader for training and validation sets
             train_loaders.append(DataLoader(train_subset, batch_size=batch_size, shuffle=True, num_workers=32, pin_memory=True))

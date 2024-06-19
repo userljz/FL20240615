@@ -1,0 +1,7 @@
+dataset_name: OrganAMNIST
+batch_size: 64
+
+dataset_root: "/home/ljz/dataset"
+# "/home/ljz/dataset"  "/Users/lijinze/Documents/Document_MacBookAir/code/dataset"
+
+classnames: ['bladder', 'femur-left', 'femur-right', 'heart', 'kidney-left', 'kidney-right', 'liver', 'lung-left', 'lung-right', 'pancreas', 'spleen']
