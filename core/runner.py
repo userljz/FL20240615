@@ -52,7 +52,7 @@ def train_fl(cfg):
         running_args["round_idx"] = round_i
         
         if round_i == 1:
-            param = get_parameters(CustomCLIP(cfg))
+            param = get_parameters(custom_clip)
             num_sanity_val_steps = 2
         else:
             num_sanity_val_steps = 0

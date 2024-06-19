@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 from clip import clip
-from core.modules.losses import contrastive_loss
+from core.modules.losses import contrastive_loss, text2text_loss
 from core.modules.PromptLearner import PromptLearner
 from core.utils import dtype_mapping
 
@@ -112,12 +112,14 @@ class CustomCLIP(nn.Module):
             text_features = text_features + w
 
         text_features = text_features / text_features.norm(dim=-1, keepdim=True)
-        text_features = text_features.unsqueeze(0)
+        # text_features = text_features.unsqueeze(0)
 
-        label = torch.arange(self.prompt_learner.n_cls, device=class_text_features.device, dtype=torch.long).unsqueeze(0).expand(class_text_features.size(0), -1)
+        # label = torch.arange(self.prompt_learner.n_cls, device=class_text_features.device, dtype=torch.long).unsqueeze(0).expand(class_text_features.size(0), -1)
+        print(f"{text_features.shape = }")
+        print(f"{class_text_features.shape = }")
+        mse_loss = self.text2text_loss(text_features, class_text_features)
         
-        ret_dict = self.loss(text_features, class_text_features, label, t=self.logit_scale)
-        return ret_dict["loss"]
+        return mse_loss
 
     def forward(self, image, label=None):
         tokenized_prompts = self.prompt_learner.tokenized_prompts

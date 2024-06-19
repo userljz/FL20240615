@@ -68,7 +68,7 @@ class PromptLearner(nn.Module):
         
         all_class_text_features = []
         if cfg.clip.use_description_ref:
-            # 使用描述性的 text reference，引入RFHL
+            # 使用描述性的 text reference，引入RLHF
             prompts = []
             for ref_idx in range(len(template_prompts)):
                 prompts.append(template_prompts[ref_idx].format(all_classnames[ref_idx]))
