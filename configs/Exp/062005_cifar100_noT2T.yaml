@@ -1,15 +1,13 @@
 # @package _global_
 defaults:
-  - override /dataset: OrganAMNIST
+  - override /dataset: cifar100
   - _self_
 
 
 device:
   # cuda_visible_devices:  "0,1,2,3,4,5,6,7"
   cuda_visible_devices:  "0,1,2,3"
-  id: 0
-
-
+  id: 3
 
 optimizer:
   _target_: torch.optim.AdamW
@@ -17,20 +15,10 @@ optimizer:
   weight_decay: 2e-6
 
 # ===========================
-process_title: modify_test
+process_title: 062005_cifar100_noT2T
 # ===========================
 
-logger:
-  wandb_enable: False
 
-fl:
-  client_num: 20
-  select_client_num: 2
-  round: 2
-  dirichlet_alpha: 0.01
-
-trainer:
-  max_epochs: 2
 
 clip:
-  img_to_ref_enable: True
+  text_to_text_enable: False

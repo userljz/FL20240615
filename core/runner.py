@@ -83,7 +83,7 @@ def train_fl(cfg):
         
         # ===== Test Global =====
         client_agg = client_fn(cfg, param, running_args, custom_clip)
-        datamodule = DataModule(cfg, 1, train_loaders, val_loaders, test_loader)
+        datamodule = DataModule(cfg, None, None, None, test_loader)
         trainer = hydra.utils.instantiate(cfg.trainer)
         trainer.test(client_agg, datamodule=datamodule)
  

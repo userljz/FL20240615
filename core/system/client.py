@@ -30,6 +30,13 @@ class Client(pl.LightningModule):
         
     def on_train_start(self):
         self.model = set_parameters(self.model, self.param)
+        
+        if self.round_idx == 1:
+            enabled = set()
+            for name, param in self.model.named_parameters():
+                if param.requires_grad:
+                    enabled.add(name)
+            self.mylogger.info(f"Parameters to be updated: {enabled}")
     
     def on_test_start(self):
         self.model = set_parameters(self.model, self.param)
@@ -46,12 +53,12 @@ class Client(pl.LightningModule):
             else:
                 param.requires_grad_(False)
         
-        if self.round_idx == 1:
-            enabled = set()
-            for name, param in self.model.named_parameters():
-                if param.requires_grad:
-                    enabled.add(name)
-            self.mylogger.info(f"Parameters to be updated: {enabled}")
+        # if self.round_idx == 1:
+        #     enabled = set()
+        #     for name, param in self.model.named_parameters():
+        #         if param.requires_grad:
+        #             enabled.add(name)
+        #     self.mylogger.info(f"Parameters to be updated: {enabled}")
         
         optimizer = hydra.utils.instantiate(self.cfg.optimizer, params_to_train)
         return optimizer
