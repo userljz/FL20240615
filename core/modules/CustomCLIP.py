@@ -97,7 +97,7 @@ class CustomCLIP(nn.Module):
     def forward_text_to_text(self):
         with torch.no_grad():
             # 获得 Frozen text Embedding 作为 Anchor(Constraint)
-            class_text_features = self.prompt_learner.class_text_features
+            class_text_features = self.prompt_learner.class_text_features.clone()
             class_text_features = class_text_features / class_text_features.norm(dim=-1, keepdim=True)
 
         if self.cfg.clip.add_noise_for_anchors:
