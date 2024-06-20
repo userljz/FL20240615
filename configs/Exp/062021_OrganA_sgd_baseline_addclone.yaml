@@ -1,0 +1,22 @@
+# @package _global_
+defaults:
+  - override /dataset: OrganAMNIST
+  - _self_
+
+
+device:
+  # cuda_visible_devices:  "0,1,2,3,4,5,6,7"
+  cuda_visible_devices:  "0,1,2,3"
+  id: 2
+
+optimizer:
+  _target_: torch.optim.SGD
+  lr: 0.001
+  momentum: 0.9
+  weight_decay: 1e-4
+
+# ===========================
+process_title: 062021_OrganA_sgd_baseline_addclone
+# ===========================
+
+
