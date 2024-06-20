@@ -1,0 +1,25 @@
+# @package _global_
+defaults:
+  - override /dataset: OrganAMNIST
+  - _self_
+
+
+device:
+  # cuda_visible_devices:  "0,1,2,3,4,5,6,7"
+  cuda_visible_devices:  "0,1,2,3"
+  id: 1
+
+optimizer:
+  _target_: torch.optim.AdamW
+  lr: 1e-4
+  weight_decay: 2e-6
+
+# ===========================
+process_title: 062014_OrganA_noT2T
+# ===========================
+
+clip:
+  text_to_text_enable: False
+  templete_prompts: [
+    'a photo of a {}.'
+    ]
