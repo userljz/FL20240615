@@ -5,7 +5,7 @@ defaults:
 
 
 device:
-  id: 2
+  id: 0
 
 optimizer:
   _target_: torch.optim.AdamW
@@ -13,7 +13,7 @@ optimizer:
   weight_decay: 2e-6
 
 # ===========================
-process_title: T2TLoss|disable_t2tLoss
+process_title: T2TLoss|0620disable_t2tLoss
 # ===========================
 
 clip:

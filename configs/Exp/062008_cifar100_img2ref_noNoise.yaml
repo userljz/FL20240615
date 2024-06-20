@@ -7,7 +7,7 @@ defaults:
 device:
   # cuda_visible_devices:  "0,1,2,3,4,5,6,7"
   cuda_visible_devices:  "0,1,2,3"
-  id: 3
+  id: 0
 
 optimizer:
   _target_: torch.optim.AdamW
@@ -15,10 +15,10 @@ optimizer:
   weight_decay: 2e-6
 
 # ===========================
-process_title: 062005_cifar100_noT2T|main_branch_code
+# 这里开始，以及以后，使用的都是 main branch 的 set_param，get_param，aggregation 函数
+process_title: 062008_cifar100_img2ref_noNoise
 # ===========================
 
-
-
 clip:
-  text_to_text_enable: False
+  img_to_ref_enable: True
+  add_noise_for_anchors: False

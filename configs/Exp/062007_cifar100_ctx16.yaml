@@ -7,7 +7,7 @@ defaults:
 device:
   # cuda_visible_devices:  "0,1,2,3,4,5,6,7"
   cuda_visible_devices:  "0,1,2,3"
-  id: 3
+  id: 2
 
 optimizer:
   _target_: torch.optim.AdamW
@@ -15,10 +15,8 @@ optimizer:
   weight_decay: 2e-6
 
 # ===========================
-process_title: 062005_cifar100_noT2T|main_branch_code
+process_title: 062007_cifar100_ctx16
 # ===========================
 
-
-
 clip:
-  text_to_text_enable: False
+  ctx_init: "a photo of a X X X X X X X X X X X X"
