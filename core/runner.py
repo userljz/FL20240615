@@ -63,6 +63,10 @@ def train_fl(cfg):
         mylogger.info(f"{client_list_use}")
         mylogger.info("----------")
         
+        if cfg.clip.momentum_ref:
+            # 动量更新 Ref Text
+            momentum_ref_list, num_samples_list = [], []
+            
         for client_idx in client_list_use:
             mylogger.info(f"\n===== Round-{round_i}|Client-{client_idx} Start =====")
             running_args["client_idx"] = client_idx
@@ -77,6 +81,12 @@ def train_fl(cfg):
             fit_res = FitRes(_param, num_samples)
             results.append(fit_res)
             
+            if cfg.clip.momentum_ref:
+                _text_feat = client.model.get_text_features()
+                momentum_ref_list.append(_text_feat)
+                num_samples_list.append(num_samples)
+        
+            
         
         # ===== Aggregation =====
         param = server.server_conduct(results)
@@ -86,5 +96,19 @@ def train_fl(cfg):
         datamodule = DataModule(cfg, None, None, None, test_loader)
         trainer = hydra.utils.instantiate(cfg.trainer)
         trainer.test(client_agg, datamodule=datamodule)
+        
+        # ===== Momentum Update Ref =====
+        if cfg.clip.momentum_ref:
+            weights_tensor = torch.tensor(num_samples_list).view(-1, 1, 1)
+            stacked_tensors = torch.stack(momentum_ref_list)
+            
+            momentum_ref = (stacked_tensors * weights_tensor).sum(dim=0) / sum(num_samples_list)
+            ref = custom_clip.prompt_learner.class_text_features
+            
+            momentum_ref = momentum_ref / momentum_ref.norm(dim=-1, keepdim=True)
+            ref = ref / ref.norm(dim=-1, keepdim=True)
+            
+            new_ref = 0.5 * ref + 0.5 * momentum_ref
+            custom_clip.prompt_learner.class_text_features = new_ref
  
     return

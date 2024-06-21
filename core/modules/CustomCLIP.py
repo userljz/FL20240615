@@ -172,4 +172,13 @@ class CustomCLIP(nn.Module):
 
         return {"loss": loss, "logits": logits}
         
-
+    def get_text_features(self):
+        tokenized_prompts = self.prompt_learner.tokenized_prompts
+        prompts = self.prompt_learner()
+        text_features = self.text_encoder(prompts, tokenized_prompts)
+        if self.cfg.clip.text_correction:
+            w = self.prompt_learner.w
+            text_features = text_features + w
+        text_features = text_features / text_features.norm(dim=-1, keepdim=True)
+        
+        return text_features

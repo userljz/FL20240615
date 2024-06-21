@@ -27,9 +27,9 @@ def set_parameters(net, parameters):
 
 
 def get_parameters(net):
-    # # 0620test
-    # for k, v in net.state_dict().items():
-    #     print(f"{k}: {v.shape}")
+    # 0620test
+    for k, v in net.state_dict().items():
+        print(f"{k}: {v.shape}")
     return [val.cpu().numpy() for _, val in net.state_dict().items()]
 
 # def get_parameters(net):
