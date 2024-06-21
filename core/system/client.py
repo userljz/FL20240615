@@ -61,7 +61,18 @@ class Client(pl.LightningModule):
         #     self.mylogger.info(f"Parameters to be updated: {enabled}")
         
         optimizer = hydra.utils.instantiate(self.cfg.optimizer, params_to_train)
-        return optimizer
+        
+        if self.cfg.optimizer.scheduler:
+            scheduler = hydra.utils.instantiate(self.cfg.lr_scheduler, optimizer)
+            return {
+                "optimizer": optimizer,
+                "lr_scheduler": {
+                    "scheduler": scheduler,
+                },
+            }
+        
+        else:
+            return optimizer
     
     def on_train_epoch_start(self):
         self.train_loss_list = []

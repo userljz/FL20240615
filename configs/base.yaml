@@ -25,6 +25,7 @@ trainer:
   enable_checkpointing: False
 
 optimizer:
+  scheduler: False
 
 
 # ===========================
