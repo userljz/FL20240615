@@ -7,30 +7,17 @@ defaults:
 device:
   # cuda_visible_devices:  "0,1,2,3,4,5,6,7"
   cuda_visible_devices:  "0,1,2,3"
-  id: 0
-
-
+  id: 3
 
 optimizer:
-  _target_: torch.optim.AdamW
-  lr: 1e-4
-  weight_decay: 2e-6
+  _target_: torch.optim.SGD
+  lr: 0.001
+  momentum: 0.9
+  weight_decay: 1e-4
 
 # ===========================
-process_title: modify_test
+process_title: 062111_OrganA_sgd_momentumRef
 # ===========================
-
-logger:
-  wandb_enable: False
-
-fl:
-  client_num: 20
-  select_client_num: 2
-  round: 2
-  dirichlet_alpha: 0.01
-
-trainer:
-  max_epochs: 2
 
 clip:
   momentum_ref: True

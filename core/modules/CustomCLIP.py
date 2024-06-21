@@ -173,11 +173,15 @@ class CustomCLIP(nn.Module):
         return {"loss": loss, "logits": logits}
         
     def get_text_features(self):
+        device = self.cfg.device.cuda
         tokenized_prompts = self.prompt_learner.tokenized_prompts
         prompts = self.prompt_learner()
+        tokenized_prompts, prompts = tokenized_prompts.to(device), prompts.to(device)
+        self.text_encoder = self.text_encoder.to(device)
+
         text_features = self.text_encoder(prompts, tokenized_prompts)
         if self.cfg.clip.text_correction:
-            w = self.prompt_learner.w
+            w = (self.prompt_learner.w).to(device)
             text_features = text_features + w
         text_features = text_features / text_features.norm(dim=-1, keepdim=True)
         

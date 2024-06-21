@@ -9,28 +9,14 @@ device:
   cuda_visible_devices:  "0,1,2,3"
   id: 0
 
-
-
 optimizer:
   _target_: torch.optim.AdamW
   lr: 1e-4
   weight_decay: 2e-6
 
 # ===========================
-process_title: modify_test
+process_title: 062112_OrganA_momentumRef
 # ===========================
-
-logger:
-  wandb_enable: False
-
-fl:
-  client_num: 20
-  select_client_num: 2
-  round: 2
-  dirichlet_alpha: 0.01
-
-trainer:
-  max_epochs: 2
 
 clip:
   momentum_ref: True
