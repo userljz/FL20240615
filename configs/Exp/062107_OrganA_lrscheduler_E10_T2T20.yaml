@@ -22,8 +22,11 @@ lr_scheduler:
 
 
 # ===========================
-process_title: 062105_OrganA_lrscheduler_E10
+process_title: 062107_OrganA_lrscheduler_E10_T2T20
 # ===========================
 
 trainer:
   max_epochs: 10
+
+clip:
+  text_to_text_weight: 20

@@ -25,8 +25,8 @@ trainer:
   enable_checkpointing: False
 
 optimizer:
-  scheduler: False
 
+scheduler_enable: False 
 
 # ===========================
 process_title: "default"

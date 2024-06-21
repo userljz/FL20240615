@@ -62,7 +62,7 @@ class Client(pl.LightningModule):
         
         optimizer = hydra.utils.instantiate(self.cfg.optimizer, params_to_train)
         
-        if self.cfg.optimizer.scheduler:
+        if self.cfg.scheduler_enable:
             scheduler = hydra.utils.instantiate(self.cfg.lr_scheduler, optimizer)
             return {
                 "optimizer": optimizer,
