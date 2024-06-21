@@ -69,6 +69,8 @@ clip:
   loss_margin: 0.2
 
   img_to_ref_enable: False
+  
   momentum_ref: False
+  momentum_weight: 0.5
 
 dtype: torch.float32

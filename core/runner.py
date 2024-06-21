@@ -109,7 +109,7 @@ def train_fl(cfg):
             momentum_ref = momentum_ref / momentum_ref.norm(dim=-1, keepdim=True)
             ref = ref / ref.norm(dim=-1, keepdim=True)
             
-            new_ref = 0.5 * ref + 0.5 * momentum_ref
+            new_ref = (1-float(cfg.clip.momentum_weight)) * ref + float(cfg.clip.momentum_weight) * momentum_ref
             
             # print(f"weights_tensor.requires_grad: {weights_tensor.requires_grad}")
             # print(f"stacked_tensors.requires_grad: {stacked_tensors.requires_grad}")
