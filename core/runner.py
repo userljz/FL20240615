@@ -82,9 +82,10 @@ def train_fl(cfg):
             results.append(fit_res)
             
             if cfg.clip.momentum_ref:
-                _text_feat = client.model.get_text_features()
-                momentum_ref_list.append(_text_feat)
-                num_samples_list.append(num_samples)
+                with torch.no_grad():
+                    _text_feat = client.model.get_text_features()
+                    momentum_ref_list.append(_text_feat.detach().cpu())
+                    num_samples_list.append(num_samples)
         
             
         
