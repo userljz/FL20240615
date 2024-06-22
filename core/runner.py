@@ -99,29 +99,30 @@ def train_fl(cfg):
         
         # ===== Momentum Update Ref =====
         if cfg.clip.momentum_ref:
-            device = cfg.device.cuda
-            weights_tensor = torch.tensor(num_samples_list).view(-1, 1, 1).to(device)
-            stacked_tensors = torch.stack(momentum_ref_list)
-            
-            momentum_ref = (stacked_tensors * weights_tensor).sum(dim=0) / sum(num_samples_list)
-            ref = custom_clip.prompt_learner.class_text_features.to(device)
-            
-            momentum_ref = momentum_ref / momentum_ref.norm(dim=-1, keepdim=True)
-            ref = ref / ref.norm(dim=-1, keepdim=True)
-            
-            new_ref = (1-float(cfg.clip.momentum_weight)) * ref + float(cfg.clip.momentum_weight) * momentum_ref
-            
-            # print(f"weights_tensor.requires_grad: {weights_tensor.requires_grad}")
-            # print(f"stacked_tensors.requires_grad: {stacked_tensors.requires_grad}")
-            # print(f"momentum_ref.requires_grad: {momentum_ref.requires_grad}")
-            # print(f"ref.requires_grad: {ref.requires_grad}")
-            # print(f"new_ref.requires_grad: {new_ref.requires_grad}")
-
-            for i, (key, val) in enumerate(custom_clip.state_dict().items()):
-                if 'prompt_learner.class_text_features' in key:
-                    # print(f"{new_ref.shape = }")
-                    # print(f"{param[i].shape = }")
-                    param[i] = new_ref.detach().cpu().numpy()
-                    break
+            with torch.no_grad():
+                device = cfg.device.cuda
+                weights_tensor = torch.tensor(num_samples_list).view(-1, 1, 1)
+                stacked_tensors = torch.stack(momentum_ref_list).cpu()
+                
+                momentum_ref = (stacked_tensors * weights_tensor).sum(dim=0) / sum(num_samples_list)
+                ref = custom_clip.prompt_learner.class_text_features.cpu()
+                
+                momentum_ref = momentum_ref / momentum_ref.norm(dim=-1, keepdim=True)
+                ref = ref / ref.norm(dim=-1, keepdim=True)
+                
+                new_ref = (1-float(cfg.clip.momentum_weight)) * ref + float(cfg.clip.momentum_weight) * momentum_ref
+                
+                # print(f"weights_tensor.requires_grad: {weights_tensor.requires_grad}")
+                # print(f"stacked_tensors.requires_grad: {stacked_tensors.requires_grad}")
+                # print(f"momentum_ref.requires_grad: {momentum_ref.requires_grad}")
+                # print(f"ref.requires_grad: {ref.requires_grad}")
+                # print(f"new_ref.requires_grad: {new_ref.requires_grad}")
+    
+                for i, (key, val) in enumerate(custom_clip.state_dict().items()):
+                    if 'prompt_learner.class_text_features' in key:
+                        # print(f"{new_ref.shape = }")
+                        # print(f"{param[i].shape = }")
+                        param[i] = new_ref.detach().cpu().numpy()
+                        break
  
     return
