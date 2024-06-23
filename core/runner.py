@@ -50,7 +50,7 @@ def train_fl(cfg):
                                                                             dataloader_num=cfg.fl.client_num,
                                                                             dataset_root=cfg.dataset.dataset_root)
     custom_clip = CustomCLIP(cfg)
-    
+    test_accu_list = []
     # ===== FL Communication Start =====
     for round_i in range(1, cfg.fl.round + 1):
         if is_main_process():
@@ -106,6 +106,7 @@ def train_fl(cfg):
         datamodule = DataModule(cfg, None, None, None, test_loader)
         trainer = hydra.utils.instantiate(cfg.trainer)
         trainer.test(client_agg, datamodule=datamodule)
+        test_accu_list.append(client_agg.avg_test_acc)
         
         # ===== Momentum Update Ref =====
         if cfg.clip.momentum_ref:
@@ -133,5 +134,11 @@ def train_fl(cfg):
                         # print(f"{param[i].shape = }")
                         param[i] = new_ref.detach().cpu().numpy()
                         break
- 
+    
+    max_test_acc = max(test_accu_list)
+    if is_main_process():
+        mylogger.info(f"Max Test Acc: {max_test_acc}")
+        if cfg.logger.wandb_enable:
+            wandb.log({f"Max_Test_Acc": max_test_acc})
+            
     return

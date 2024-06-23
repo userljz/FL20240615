@@ -111,13 +111,14 @@ class Client(pl.LightningModule):
         return {'test_loss': loss, 'test_acc': acc}
     
     def on_test_epoch_end(self):
-        avg_test_acc = torch.stack(self.test_acc_batch).mean()
+        self.avg_test_acc = torch.stack(self.test_acc_batch).mean()
         if self.trainer.is_global_zero:
             self.mylogger.info(f"------------------------------")
-            self.mylogger.info(f'Round[{self.round_idx}] - test_acc: {avg_test_acc}')
+            self.mylogger.info(f'Round[{self.round_idx}] - test_acc: {self.avg_test_acc}')
             self.mylogger.info(f"------------------------------")
             if self.cfg.logger.wandb_enable:
-                wandb.log({f"Server_Test_Acc:": avg_test_acc})
+                wandb.log({f"Server_Test_Acc:": self.avg_test_acc})
+        
     
     def on_validation_epoch_start(self):
         self.val_acc_batch = []
