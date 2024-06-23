@@ -21,3 +21,6 @@ process_title: 062301_OrganA_sgd_baselineNoT2T_400R
 
 clip:
   text_to_text_enable: False
+
+fl:
+  round: 400

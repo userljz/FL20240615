@@ -19,5 +19,5 @@ optimizer:
 process_title: 062302_OrganA_sgd_baseline_400R
 # ===========================
 
-clip:
-  text_to_text_enable: False
+fl:
+  round: 400
