@@ -73,4 +73,6 @@ clip:
   momentum_ref: False
   momentum_weight: 0.5
 
+  use_shared_ctx: False
+
 dtype: torch.float32

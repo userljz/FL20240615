@@ -27,7 +27,13 @@ class PromptLearner(nn.Module):
         prompt = clip.tokenize(ctx_init).to(self.device)
         with torch.no_grad():
             embedding = clip_model.token_embedding(prompt).to(self.device).type(dtype)  # [batch_size, (1+ n_ctx + *), ctx_dim]
-        ctx_vectors = embedding[0, 1: 1 + n_ctx, :]
+        
+        if self.cfg.clip.use_shared_ctx:
+            ctx_vectors = embedding[0, 1: 1 + n_ctx, :]
+        else:
+            ctx_vector = embedding[0, 1: 1 + n_ctx, :]
+            ctx_vectors = ctx_vector.unsqueeze(0).expand(n_cls, -1, -1).clone()
+        
         prompt_prefix = ctx_init
         
         self.mylogger.info(f'Initial context: "{prompt_prefix}"')
@@ -123,7 +129,8 @@ class PromptLearner(nn.Module):
         ctx = self.ctx  # (n_ctx, ctx_dim)
         
         # Use instance-conditioned context tokens for all classes
-        ctx = ctx.unsqueeze(0).expand(n_cls, -1, -1)
+        if self.cfg.clip.use_shared_ctx:
+            ctx = ctx.unsqueeze(0).expand(n_cls, -1, -1)
         prompts = self.construct_prompts(ctx, prefix, suffix)  # (n_cls, n_tkn, ctx_dim)
         
         return prompts
