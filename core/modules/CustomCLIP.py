@@ -65,7 +65,8 @@ class ClipModel_from_generated(nn.Module):
                 nn.Linear(fc_input_dim, mlp_hiddenlayer_num),
                 nn.ReLU(),
                 nn.Linear(mlp_hiddenlayer_num, fc_output_dim)
-            ).to(cfg.device.cuda)
+            )
+            # .to(cfg.device.cuda)
     
     def forward(self, img_emb):
         if self.cfg.clip.use_mlp:
@@ -80,7 +81,7 @@ class CustomCLIP(nn.Module):
     def __init__(self, cfg):
         super().__init__()
         self.dtype = dtype_mapping[cfg.dtype]
-        origin_clip, _ = clip.load(cfg.clip.backbone, device=cfg.device.cuda)
+        origin_clip, _ = clip.load(cfg.clip.backbone, device="cpu")
         origin_clip = origin_clip.to(self.dtype)
         classnames = cfg.dataset.classnames
         
@@ -173,7 +174,8 @@ class CustomCLIP(nn.Module):
         return {"loss": loss, "logits": logits}
         
     def get_text_features(self):
-        device = self.cfg.device.cuda
+        # device = self.cfg.device.cuda
+        device = torch.device("cpu")
         tokenized_prompts = self.prompt_learner.tokenized_prompts
         prompts = self.prompt_learner()
         tokenized_prompts, prompts = tokenized_prompts.to(device), prompts.to(device)

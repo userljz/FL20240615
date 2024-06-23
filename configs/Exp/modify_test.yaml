@@ -31,6 +31,10 @@ fl:
 
 trainer:
   max_epochs: 2
+  # devices:
+  #   - 0
+  #   - 1
+  # strategy: "ddp_find_unused_parameters_true"
 
 clip:
   momentum_ref: True

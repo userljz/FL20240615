@@ -19,7 +19,8 @@ class PromptLearner(nn.Module):
         self.ctx_dim = ctx_dim
         self.cfg = cfg
         self.mylogger = get_logger(f"{cfg.output_dir}/{cfg.logger.project}_{cfg.logger.name}.log")
-        self.device = cfg.device.cuda
+        # self.device = cfg.device.cuda
+        self.device = torch.device("cpu")
         
         # ctx_init = ctx_init.replace("_", " ")
         n_ctx = len(ctx_init.split(" "))

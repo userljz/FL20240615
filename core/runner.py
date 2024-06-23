@@ -5,10 +5,11 @@ import os
 import hydra
 import wandb
 from omegaconf import OmegaConf
+import pytorch_lightning as pl
 
 from core.system import Client, Server
 from core.modules import DataModule, CustomCLIP
-from core.utils import get_parameters, FitRes, set_random_seed, set_device, select_round_clients, print_cfg
+from core.utils import get_parameters, FitRes, set_random_seed, set_device, select_round_clients, print_cfg, is_main_process
 from core.logger_utils import get_logger
 from core.data_utils import load_dataloader_from_generate
 
@@ -26,15 +27,20 @@ def client_fn(cfg, param, running_args, custom_clip):
 
 
 def train_fl(cfg):
-    print_cfg(cfg)
-    set_random_seed(seed=cfg.seed)
+    if is_main_process():
+        print_cfg(cfg)
+        if cfg.logger.wandb_enable:
+            config_dict = OmegaConf.to_container(cfg, resolve=True)
+            wandb.init(project=cfg.logger.project, name=cfg.logger.name, config=config_dict)
+        mylogger = get_logger(f"{cfg.output_dir}/{cfg.logger.project}_{cfg.logger.name}.log")
+
+    # set_random_seed(seed=cfg.seed)
+    pl.seed_everything(cfg.seed, workers=True)
     set_device(cfg.device)
-    if cfg.logger.wandb_enable:
-        config_dict = OmegaConf.to_container(cfg, resolve=True)
-        wandb.init(project=cfg.logger.project, name=cfg.logger.name, config=config_dict)
     
+
     server = Server(cfg)
-    mylogger = get_logger(f"{cfg.output_dir}/{cfg.logger.project}_{cfg.logger.name}.log")
+    
     running_args = {}
     
     train_loaders, val_loaders, test_loader = load_dataloader_from_generate(dataset_name=cfg.dataset.dataset_name,
@@ -47,7 +53,8 @@ def train_fl(cfg):
     
     # ===== FL Communication Start =====
     for round_i in range(1, cfg.fl.round + 1):
-        mylogger.info(f"===== Round-{round_i} Start =====")
+        if is_main_process():
+            mylogger.info(f"===== Round-{round_i} Start =====")
         results = []
         running_args["round_idx"] = round_i
         
@@ -58,17 +65,19 @@ def train_fl(cfg):
             num_sanity_val_steps = 0
             
         client_list_use = select_round_clients(cfg.fl.client_num, cfg.fl.select_client_num)
-        mylogger.info("----------")
-        mylogger.info(f"Round-{round_i} Selected Clients:")
-        mylogger.info(f"{client_list_use}")
-        mylogger.info("----------")
+        if is_main_process():
+            mylogger.info("----------")
+            mylogger.info(f"Round-{round_i} Selected Clients:")
+            mylogger.info(f"{client_list_use}")
+            mylogger.info("----------")
         
         if cfg.clip.momentum_ref:
             # 动量更新 Ref Text
             momentum_ref_list, num_samples_list = [], []
             
         for client_idx in client_list_use:
-            mylogger.info(f"\n===== Round-{round_i}|Client-{client_idx} Start =====")
+            if is_main_process():
+                mylogger.info(f"\n===== Round-{round_i}|Client-{client_idx} Start =====")
             running_args["client_idx"] = client_idx
             datamodule = DataModule(cfg, client_idx, train_loaders, val_loaders, test_loader)
             client = client_fn(cfg, param, running_args, custom_clip)
@@ -101,7 +110,6 @@ def train_fl(cfg):
         # ===== Momentum Update Ref =====
         if cfg.clip.momentum_ref:
             with torch.no_grad():
-                device = cfg.device.cuda
                 weights_tensor = torch.tensor(num_samples_list).view(-1, 1, 1)
                 stacked_tensors = torch.stack(momentum_ref_list).cpu()
                 

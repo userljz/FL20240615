@@ -43,6 +43,13 @@ def print_cfg(cfg):
         mylogger.info(f"{key}: {value}")
     mylogger.info("----------------------------")
 
+def is_main_process():
+    # 检查是否在多 GPU 环境中
+    if 'LOCAL_RANK' in os.environ:
+        return int(os.environ['LOCAL_RANK']) == 0
+    # 如果不在多 GPU 环境中，默认为主进程
+    return True
+
 
 @dataclass
 class FitRes:
@@ -67,8 +74,8 @@ def set_device(device_config):
     else:
         # set the global cuda device
         torch.backends.cudnn.enabled = True
-        os.environ["CUDA_VISIBLE_DEVICES"] = str(device_config.cuda_visible_devices)
-        torch.cuda.set_device(device_config.cuda)
+        # os.environ["CUDA_VISIBLE_DEVICES"] = str(device_config.cuda_visible_devices)
+        # torch.cuda.set_device(device_config.cuda)
         torch.set_float32_matmul_precision(device_config.float32_matmul_precision)
         # warnings.filterwarnings("always")
     

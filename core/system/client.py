@@ -30,13 +30,13 @@ class Client(pl.LightningModule):
         
     def on_train_start(self):
         self.model = set_parameters(self.model, self.param)
-        
-        if self.round_idx == 1:
-            enabled = set()
-            for name, param in self.model.named_parameters():
-                if param.requires_grad:
-                    enabled.add(name)
-            self.mylogger.info(f"Parameters to be updated: {enabled}")
+        if self.trainer.is_global_zero:
+            if self.round_idx == 1:
+                enabled = set()
+                for name, param in self.model.named_parameters():
+                    if param.requires_grad:
+                        enabled.add(name)
+                self.mylogger.info(f"Parameters to be updated: {enabled}")
     
     def on_test_start(self):
         self.model = set_parameters(self.model, self.param)
@@ -79,7 +79,6 @@ class Client(pl.LightningModule):
     
     def training_step(self, batch, batch_idx):
         image, label = batch
-        image, label = image.to(self.device), label.to(self.device)
         
         model_ret = self.model(image, label)
         loss = model_ret["loss"]
@@ -90,9 +89,10 @@ class Client(pl.LightningModule):
     def on_train_epoch_end(self):
         # outputs 是一个由 validation_step 返回的字典组成的列表
         avg_train_loss = torch.stack(self.train_loss_list).mean()
-        self.mylogger.info(f"Round[{self.round_idx}]-Client[{self.client_idx}] - Epoch[{self.current_epoch}/{self.trainer.max_epochs}] train_loss: {avg_train_loss}")
-        if self.cfg.logger.wandb_enable:
-            wandb.log({f"Client{self.client_idx}|Train_loss:": avg_train_loss})
+        if self.trainer.is_global_zero:
+            self.mylogger.info(f"Round[{self.round_idx}]-Client[{self.client_idx}] - Epoch[{self.current_epoch}/{self.trainer.max_epochs}] train_loss: {avg_train_loss}")
+            if self.cfg.logger.wandb_enable:
+                wandb.log({f"Client{self.client_idx}|Train_loss:": avg_train_loss})
         return
     
     def on_test_epoch_start(self):
@@ -112,11 +112,12 @@ class Client(pl.LightningModule):
     
     def on_test_epoch_end(self):
         avg_test_acc = torch.stack(self.test_acc_batch).mean()
-        self.mylogger.info(f"------------------------------")
-        self.mylogger.info(f'Round[{self.round_idx}] - test_acc: {avg_test_acc}')
-        self.mylogger.info(f"------------------------------")
-        if self.cfg.logger.wandb_enable:
-            wandb.log({f"Server_Test_Acc:": avg_test_acc})
+        if self.trainer.is_global_zero:
+            self.mylogger.info(f"------------------------------")
+            self.mylogger.info(f'Round[{self.round_idx}] - test_acc: {avg_test_acc}')
+            self.mylogger.info(f"------------------------------")
+            if self.cfg.logger.wandb_enable:
+                wandb.log({f"Server_Test_Acc:": avg_test_acc})
     
     def on_validation_epoch_start(self):
         self.val_acc_batch = []
@@ -136,9 +137,10 @@ class Client(pl.LightningModule):
     def on_validation_epoch_end(self):
         # outputs 是一个由 validation_step 返回的字典组成的列表
         avg_val_acc = torch.stack(self.val_acc_batch).mean()
-        self.mylogger.info(f'Round[{self.round_idx}]-Client[{self.client_idx}] - val_acc: {avg_val_acc}')
-        if self.cfg.logger.wandb_enable:
-            wandb.log({f"Client{self.client_idx}|Val_Acc:": avg_val_acc})
+        if self.trainer.is_global_zero:
+            self.mylogger.info(f'Round[{self.round_idx}]-Client[{self.client_idx}] - val_acc: {avg_val_acc}')
+            if self.cfg.logger.wandb_enable:
+                wandb.log({f"Client{self.client_idx}|Val_Acc:": avg_val_acc})
     
     
 
