@@ -117,7 +117,7 @@ class Client(pl.LightningModule):
             self.mylogger.info(f'Round[{self.round_idx}] - test_acc: {self.avg_test_acc}')
             self.mylogger.info(f"------------------------------")
             if self.cfg.logger.wandb_enable:
-                wandb.log({f"Server_Test_Acc:": self.avg_test_acc})
+                wandb.log({f"Server_Test_Acc:": self.avg_test_acc, "Round": self.round_idx})
         
     
     def on_validation_epoch_start(self):
