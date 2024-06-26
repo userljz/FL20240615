@@ -1,0 +1,27 @@
+# @package _global_
+defaults:
+  - override /dataset: OrganAMNIST
+  - _self_
+
+
+device:
+  # cuda_visible_devices:  "0,1,2,3,4,5,6,7"
+  cuda_visible_devices:  "0,1,2,3"
+  id: 2
+
+optimizer:
+  _target_: torch.optim.SGD
+  lr: 1e-4
+  momentum: 0.9
+  weight_decay: 1e-4
+
+# ===========================
+process_title: 062603_OrganA_sgd_alpha01_noT2T_lr1e4
+# ===========================
+
+clip:
+  text_to_text_enable: False
+
+fl:
+  dirichlet_alpha: 0.1
+  round: 400
